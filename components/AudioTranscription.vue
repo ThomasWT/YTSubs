@@ -1,21 +1,21 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center p-4">
-    <div class="bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full">
-      <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">Audio Transcription</h1>
+  <div class="min-h-screen flex items-center justify-center p-4">
+    <div class="backdrop-blur-md bg-purple-300/30 rounded-lg shadow-2xl p-8 max-w-2xl w-full border-2 border-purple-400/30">
+      <h1 class="text-4xl font-bold text-center mb-8 py-2 px-4 bg-gradient-to-r from-purple-400 to-purple-700 text-transparent bg-clip-text stroke-effect">YTSubs</h1>
       
       <div class="mb-6">
         <input 
           v-model="transcription" 
           type="text" 
-          placeholder="Enter YouTube URL or upload audio file"
-          class="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          placeholder="Enter YouTube URL"
+          class="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none bg-white placeholder-purple-400"
         />
       </div>
 
       <div class="mb-6">
         <button 
           @click="handleFileUpload" 
-          class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-300"
+          class="w-full bg-purple-900/50 backdrop-blur-md text-white py-2 px-4 rounded-md hover:bg-purple-900/30 transition duration-300 border border-white/30 shadow-lg"
         >
           Transcribe Audio
         </button>
@@ -26,10 +26,9 @@
         <p class="ml-3 text-gray-600">Transcribing...</p>
       </div>
 
-      <div v-if="srtContent" class="mb-6">
-        <div class="flex justify-between">
-          <h2 class="text-xl font-semibold mb-2 text-gray-700">Subtitle file:</h2>
-          <button class="text-indigo-600 rounded-md flex items-center hover:text-indigo-400" @click="downloadSRT">
+      <div v-if="srtContent" class="mb-6 gap-2 flex flex-col">
+        <div class="flex justify-end">
+          <button class="text-white rounded-md flex items-center" @click="downloadSRT">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
@@ -78,6 +77,7 @@ const transcribeAudio = async (file: Blob) => {
     return null;
   }
 };
+
 
 
 const downloadSRT = () => {

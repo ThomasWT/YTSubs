@@ -1,5 +1,4 @@
 import { pipeline, env } from '@xenova/transformers'
-
 env.allowLocalModels = false
 env.cacheDir = './.cache';
 env.backends.onnx.logSeverityLevel = 4;

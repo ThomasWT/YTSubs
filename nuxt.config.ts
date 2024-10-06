@@ -4,13 +4,6 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   ssr:false,
   modules: ['nuxt-workers', '@nuxtjs/tailwindcss'],
-  nitro: {
-    esbuild: {
-      options: {
-        target: 'esnext'
-      }
-    }
-  },
   // or sourcemap: true
   sourcemap: {
     server: true,
