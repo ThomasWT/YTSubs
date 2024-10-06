@@ -2,15 +2,8 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
-  modules: ['nuxt-workers'],
-  plugins: [
-    '~/plugins/transformers.client.ts'
-  ],
-  vite: {
-    optimizeDeps: {
-      exclude: ['@xenova/transformers']
-    }
-  },
+  ssr:false,
+  modules: ['nuxt-workers', '@nuxtjs/tailwindcss'],
   nitro: {
     esbuild: {
       options: {
