@@ -16,14 +16,19 @@
         <button 
           @click="handleFileUpload" 
           class="w-full bg-purple-900/50 backdrop-blur-md text-white py-2 px-4 rounded-md hover:bg-purple-900/30 transition duration-300 border border-white/30 shadow-lg"
+          :disabled="loading"
         >
-          Transcribe Audio
+          {{ loading ? 'Transcribing...' : 'Transcribe Audio' }}
         </button>
       </div>
 
       <div v-if="loading" class="mb-4 flex justify-center items-center">
         <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
         <p class="ml-3 text-gray-600">Transcribing...</p>
+      </div>
+
+      <div v-if="error" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+        {{ error }}
       </div>
 
       <div v-if="srtContent" class="mb-6 gap-2 flex flex-col">
@@ -36,7 +41,7 @@
           </button>
         </div>
      
-        <pre class="bg-gray-100 p-4 rounded-md text-sm text-gray-800 overflow-x-auto">{{ srtContent }}</pre>
+        <pre class="bg-gray-100 p-4 rounded-md text-sm text-gray-800 overflow-x-auto shadow-md">{{ srtContent }}</pre>
       </div>
     </div>
   </div>
@@ -52,6 +57,8 @@ const transcription = ref('');
 const resultTranscript = ref('')
 const srtContent = ref('')
 const loading = ref(false)
+const error = ref('') // Add this line
+const filename = ref('')
 // Remove the progress ref as it's no longer needed
 // const progress = ref(0)
 
@@ -86,7 +93,7 @@ const downloadSRT = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'transcription.srt';
+    a.download = filename.value.replace('.mp3', '')+'.srt';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -96,9 +103,11 @@ const downloadSRT = () => {
 
 
 const handleFileUpload = async () => {
+   filename.value = ''
   if(transcription.value) {
     try {
       loading.value = true
+      error.value = '' // Clear any previous errors
       const file = await $fetch('/api/mp3downloader', {
         query: {
           url: encodeURIComponent(transcription.value)
@@ -107,23 +116,26 @@ const handleFileUpload = async () => {
       if (file) {
         try {
           const result = await transcribeAudio('/' + file);
+          filename.value = file
           if (result) {
             resultTranscript.value = result.text;
-            // Generate SRT content
             srtContent.value = generateSRT(result.chunks);
-            // You can now use srtContent as needed (e.g., display it or save it to a file)
+          } else {
+            error.value = 'Transcription failed. Please try again.'
           }
-          loading.value = false
         } catch (err) {
-          loading.value = false
-          return null
+          error.value = 'Error during transcription: ' + (err.message || 'Unknown error')
         }
+      } else {
+        error.value = 'Failed to download audio. Please check the URL and try again.'
       }
     } catch (error) {
+      error.value = 'File upload error: ' + (error.message || 'Unknown error')
+    } finally {
       loading.value = false
-      console.error('File upload error:', error);
     }
-
+  } else {
+    error.value = 'Please enter a YouTube URL'
   }
 };
 
