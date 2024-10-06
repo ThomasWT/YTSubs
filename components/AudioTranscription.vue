@@ -69,7 +69,7 @@ const transcribeAudio = async (file: Blob) => {
       num_workers: 50,
       batch_size: 8,
       callback_function: function (beams) { 
-            console.log(beams)
+            //something here
          } 
     });
     return output;
