@@ -51,6 +51,7 @@ export default defineEventHandler(async (event) => {
           }
         });
       }); */
+      console.log(err)
       return err.message.replace('Output file already exists: public/', '');
     }
   }
