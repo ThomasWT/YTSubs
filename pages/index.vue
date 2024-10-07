@@ -9,7 +9,7 @@
 import { useSeoMeta } from '#imports'
 
 // Define SEO metadata
-useSeoMeta({
+useServerSeoMeta({
   title: 'YTSubs',
   description: 'Extract subtitles from YouTube videos using AI technology. Fast, accurate, and easy to use.',
   ogTitle: 'AI-Powered YouTube Subtitle Extractor | Get Video Captions Instantly',
