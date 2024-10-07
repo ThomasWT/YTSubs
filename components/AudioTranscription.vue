@@ -1,7 +1,8 @@
 <template>
   <div class="min-h-screen flex items-center justify-center p-4">
     <div class="backdrop-blur-md bg-purple-300/30 rounded-lg shadow-2xl p-8 max-w-2xl w-full border-2 border-purple-400/30">
-      <h1 class="text-4xl font-bold text-center mb-8 py-2 px-4 bg-gradient-to-r from-purple-400 to-purple-700 text-transparent bg-clip-text stroke-effect">YTSubs</h1>
+      <h1 class="text-4xl font-bold text-center mb-8 py-2 px-4 bg-gradient-to-br from-slate-800 to-purple-500 text-transparent bg-clip-text stroke-effect">YTSubs <span class="border border-purple-500 text-purple-500 shadow-sm text-xs font-medium me-2 px-2.5 py-0.5 rounded">Free</span>
+      </h1>
       
       <div class="mb-6">
         <input 
@@ -15,25 +16,34 @@
       <div class="mb-6">
         <button 
           @click="handleFileUpload" 
-          class="w-full bg-purple-900/50 backdrop-blur-md text-white py-2 px-4 rounded-md hover:bg-purple-900/30 transition duration-300 border border-white/30 shadow-lg"
+          class="w-full bg-purple-900/50 backdrop-blur-md text-white py-2 px-4 rounded-md hover:bg-purple-900/40 transition duration-300 border border-white/30 shadow-lg"
           :disabled="loading"
         >
           {{ loading ? 'Transcribing...' : 'Transcribe Audio' }}
         </button>
       </div>
       
-      <div v-if="estimatedProcessingTime" class="mb-4 text-sm text-gray-600">
+     <!--  <div v-if="estimatedProcessingTime" class="mb-4 text-sm text-gray-600">
         <div class="mt-2 w-full  backdrop-blur-md bg-purple-300/10 rounded-full h-2.5">
           <div class="bg-purple-600/70 h-2.5 rounded-full" :style="{ width: `${progressPercentage}%` }"></div>
         </div>
         <div class="mt-1 text-xs text-white">
           Time elapsed: {{ formatTime(elapsedTime) }}
         </div>
-      </div>
+      </div> -->
+      
 
-      <div v-if="loading" class="mb-4 flex justify-center items-center">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
-        <p class="ml-3 text-gray-600">Transcribing...</p>
+      <div v-if="loading" class="mb-4 flex justify-center items-center flex-col">
+        
+        <p class="text-white mb-4">{{ estimatedProcessingTime }}</p>
+        <div class="flex" role="status">
+            <svg aria-hidden="true" class="w-6 h-6 text-purple-400 animate-spin fill-purple-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+            </svg>
+            <p class="ml-3 text-purple-600">Transcribing...</p>
+        </div>
+
       </div>
 
       <div v-if="error" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
@@ -72,13 +82,17 @@ const duration = ref(0)
 // Remove the progress ref as it's no longer needed
 // const progress = ref(0)
 
+setInterval(() => {
+  progress(duration.value)
+}, 1000)
+
 const estimatedProcessingTime = computed(() => {
   if (duration.value > 0) {
     // Calculate estimated processing time
     const estimatedSeconds = Math.round(duration.value * (84 / 76))
     const minutes = Math.floor(estimatedSeconds / 60)
     const seconds = estimatedSeconds % 60
-    return `Estimated processing time: ${minutes} minute${minutes !== 1 ? 's' : ''} and ${seconds} second${seconds !== 1 ? 's' : ''}`
+    return `Estimated time: ${minutes} minute${minutes !== 1 ? 's' : ''} and ${seconds} second${seconds !== 1 ? 's' : ''}`
   }
   return ''
 })
@@ -94,9 +108,6 @@ const transcribeAudio = async (file: Blob) => {
       task: 'transcribe',
       num_workers: 50,
       batch_size: 8,
-      callback_function: function (beams) { 
-            //something here
-         } 
     });
     return output;
   } catch (err) {
@@ -120,8 +131,14 @@ const downloadSRT = () => {
 };
 
 const handleFileUpload = async () => {
-   filename.value = ''
-  if(transcription.value) {
+  filename.value = ''
+  if (transcription.value) {
+    // Add YouTube URL validation
+    if (!transcription.value.includes('v=')) {
+      error.value = 'Please enter a valid YouTube URL containing a video ID (v= parameter)'
+      return
+    }
+
     try {
       loading.value = true
       error.value = '' // Clear any previous errors
@@ -135,6 +152,7 @@ const handleFileUpload = async () => {
         },
       });
       if (file) {
+        
         try {
                     
           // Get the length of the MP3 file
@@ -151,7 +169,7 @@ const handleFileUpload = async () => {
             resultTranscript.value = result.text;
             srtContent.value = generateSRT(result.chunks);
           } else {
-            error.value = 'Transcription failed. Please try again.';
+            error.value = 'Error. Try again. no seriously.'
           }
         } catch (err) {
           error.value = 'Error during transcription: ' + (err.message || 'Unknown error')
