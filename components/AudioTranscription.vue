@@ -21,7 +21,7 @@
         >
         <div class="w-full flex justify-center items-center h-6 overflow-hidden">
           <Transition name="slide-up">
-            <span v-if="loading">
+            <span class="absolute" v-if="loading">
               <div class="flex" role="status">
                   <svg aria-hidden="true" class="w-6 h-6 text-purple-200 animate-spin fill-purple-400" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
@@ -38,28 +38,6 @@
         </button>
       </div>
       
-     <!--  <div v-if="estimatedProcessingTime" class="mb-4 text-sm text-gray-600">
-        <div class="mt-2 w-full  backdrop-blur-md bg-purple-300/10 rounded-full h-2.5">
-          <div class="bg-purple-600/70 h-2.5 rounded-full" :style="{ width: `${progressPercentage}%` }"></div>
-        </div>
-        <div class="mt-1 text-xs text-white">
-          Time elapsed: {{ formatTime(elapsedTime) }}
-        </div>
-      </div> -->
-      
-
-<!--       <div v-if="loading" class="mb-4 flex justify-center items-center flex-col">
-        
-        <p class="text-white mb-4">{{ estimatedProcessingTime }}</p>
-        <div class="flex" role="status">
-            <svg aria-hidden="true" class="w-6 h-6 text-purple-400 animate-spin fill-purple-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
-                <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
-            </svg>
-            <p class="ml-3 text-purple-600">Transcribing...</p>
-        </div>
-
-      </div> -->
 
       <div v-if="error" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
         {{ error }}
@@ -67,7 +45,7 @@
 
       <div v-if="srtContent" class="mb-6 gap-2 flex flex-col">
         <div class="flex justify-end">
-          <button class="text-white rounded-md flex items-center" @click="downloadSRT">
+          <button :disabled="loading" class="text-white rounded-md flex items-center" @click="downloadSRT">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
@@ -127,41 +105,6 @@ const transcribeAudio = async (file: Blob) => {
   }
 };
 
-const fileExists = async (file) => {
-  // If file is a Blob, get its name
-  const fileName = typeof file === 'string' ? file : (file instanceof File ? file.name : (file instanceof Blob ? 'unnamed-blob' : 'unknown'));
-  return await new Promise((resolve) => {
-            const dbName = 'AudioTranscriptionDB';
-            const storeName = 'files';
-            const version = 1;
-
-            const request = indexedDB.open(dbName, version);
-
-            request.onsuccess = (event) => {
-              const db = event.target.result;
-              const transaction = db.transaction([storeName], 'readonly');
-              const store = transaction.objectStore(storeName);
-
-              const getRequest = store.get(fileName);
-
-              getRequest.onsuccess = () => {
-                resolve(!!getRequest.result);
-              };
-
-              getRequest.onerror = () => {
-                console.error('Error checking file existence:', getRequest.error);
-                resolve(false);
-              };
-            };
-
-            request.onerror = (event) => {
-              console.error('IndexedDB error:', event.target.error);
-              resolve(false);
-            };
-  });
-}
-
-
 
 const downloadSRT = () => {
   if (srtContent.value) {
@@ -184,6 +127,7 @@ const handleFileUpload = async () => {
             }
         })
   filename.value = ''
+  srtContent.value = ''
   if (transcription.value) {
     // Add YouTube URL validation
     if (!transcription.value.includes('v=')) {
@@ -224,6 +168,11 @@ const handleFileUpload = async () => {
                 resultTranscript.value = result.text;
                 srtContent.value = generateSRT(result.chunks);
                 loading.value = false
+                await $fetch('/api/mp3downloader', {
+                    query: {
+                      delfile: true
+                    }
+                })
               } else {
                 error.value = 'Error. Try again. no seriously.'
                 loading.value = false
@@ -296,10 +245,6 @@ const processingStartTime = ref(0)
 </script>
 
 <style>
-
-span {
-  position: absolute;
-}
 
 .slide-up-enter-active,
 .slide-up-leave-active {
