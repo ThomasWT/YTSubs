@@ -82,10 +82,6 @@ const duration = ref(0)
 // Remove the progress ref as it's no longer needed
 // const progress = ref(0)
 
-setInterval(() => {
-  progress(duration.value)
-}, 1000)
-
 const estimatedProcessingTime = computed(() => {
   if (duration.value > 0) {
     // Calculate estimated processing time
@@ -116,6 +112,42 @@ const transcribeAudio = async (file: Blob) => {
   }
 };
 
+const fileExists = async (file) => {
+  // If file is a Blob, get its name
+  const fileName = typeof file === 'string' ? file : (file instanceof File ? file.name : (file instanceof Blob ? 'unnamed-blob' : 'unknown'));
+  return await new Promise((resolve) => {
+            const dbName = 'AudioTranscriptionDB';
+            const storeName = 'files';
+            const version = 1;
+
+            const request = indexedDB.open(dbName, version);
+
+            request.onsuccess = (event) => {
+              const db = event.target.result;
+              const transaction = db.transaction([storeName], 'readonly');
+              const store = transaction.objectStore(storeName);
+
+              const getRequest = store.get(fileName);
+
+              getRequest.onsuccess = () => {
+                resolve(!!getRequest.result);
+              };
+
+              getRequest.onerror = () => {
+                console.error('Error checking file existence:', getRequest.error);
+                resolve(false);
+              };
+            };
+
+            request.onerror = (event) => {
+              console.error('IndexedDB error:', event.target.error);
+              resolve(false);
+            };
+  });
+}
+
+
+
 const downloadSRT = () => {
   if (srtContent.value) {
     const blob = new Blob([srtContent.value], { type: 'text/plain' });
@@ -131,6 +163,11 @@ const downloadSRT = () => {
 };
 
 const handleFileUpload = async () => {
+  await $fetch('/api/mp3downloader', {
+            query: {
+              delfile: true
+            }
+        })
   filename.value = ''
   if (transcription.value) {
     // Add YouTube URL validation
@@ -145,45 +182,56 @@ const handleFileUpload = async () => {
       processingStartTime.value = Date.now()
       elapsedTime.value = 0
       updateElapsedTime()
-
       const file = await $fetch('/api/mp3downloader', {
         query: {
           url: encodeURIComponent(transcription.value)
         },
       });
+
       if (file) {
-        
         try {
-                    
-          // Get the length of the MP3 file
+          // Get the file from IndexedDB
           const audio = new Audio('/' + file);
-          audio.addEventListener('loadedmetadata', () => {
-           duration.value = audio.duration;
+          
+          audio.addEventListener('loadedmetadata', async () => {
+            duration.value = audio.duration;
             console.log(`MP3 file length: ${duration.value} seconds`);
+            if(duration.value > 1200) {
+              error.value = 'Video too long. Max 20 minutes'
+              loading.value = false
+              return;
+            } else {
+              // Use the file URL instead of the blob for transcription
+              const result = await transcribeAudio('/' + file);
+              filename.value = file;
+
+              if (result) {
+                resultTranscript.value = result.text;
+                srtContent.value = generateSRT(result.chunks);
+                loading.value = false
+              } else {
+                error.value = 'Error. Try again. no seriously.'
+                loading.value = false
+              }
+            }
           });
-          const result = await transcribeAudio('/' + file);
-          filename.value = file;
+          
 
-
-          if (result) {
-            resultTranscript.value = result.text;
-            srtContent.value = generateSRT(result.chunks);
-          } else {
-            error.value = 'Error. Try again. no seriously.'
-          }
         } catch (err) {
           error.value = 'Error during transcription: ' + (err.message || 'Unknown error')
+          loading.value = false
         }
       } else {
         error.value = 'Failed to download audio. Please check the URL and try again.'
+        loading.value = false
       }
-    } catch (error) {
-      error.value = 'File upload error: ' + (error.message || 'Unknown error')
-    } finally {
+    } catch (err) {
+      error.value = 'File upload error: ' + (err.message || 'Unknown error')
       loading.value = false
     }
   } else {
     error.value = 'Please enter a YouTube URL'
+    loading.value = false
   }
 };
 

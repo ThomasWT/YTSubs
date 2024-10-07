@@ -5,36 +5,38 @@ import fs from 'fs'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
+  if(query.delfile) {
+    const publicDir = './public';
+    fs.readdir(publicDir, (err, files) => {
+      if (err) {
+        console.error('Error reading directory:', err);
+        return;
+      }
+      
+      files.forEach(file => {
+        if (file.endsWith('.mp3')) {
+          fs.unlink(join(publicDir, file), err => {
+            if (err) {
+              console.error(`Error deleting file ${file}:`, err);
+            } else {
+              console.log(`Deleted file: ${file}`);
+            }
+          });
+        }
+      });
+    });
+    
+    return { message: 'MP3 files deletion process initiated' };
+  }
   if (query?.url) {
     const downloader = new Downloader({
       getTags: false,
-      outputDir: './public'
+      outputDir: './public',
     });
 
     try {
       const downloadResult = await downloader.downloadSong(decodeURIComponent(query.url));
-      console.log(downloadResult);
-
-      // Get the file path
-      const filePath = join(process.cwd(), downloadResult);
-
-      // Set appropriate headers
-      event.node.res.setHeader('Content-Type', 'audio/mpeg');
-      event.node.res.setHeader('Content-Disposition', `attachment; filename="${downloadResult}.mp3"`);
-
-      // Create a read stream and pipe it to the response
-      const fileStream = createReadStream(filePath);
-      // Delete the file from ./public after streaming
-      fileStream.on('close', () => {
-        fs.unlink(filePath, (err) => {
-          if (err) {
-            console.error('Error deleting file:', err);
-          } else {
-            console.log('File deleted successfully');
-          }
-        });
-      });
-      return downloadResult;
+      return downloadResult.toString().replace('public/', '');
     } catch (err) {
 
       const fileStream = createReadStream('./public/'+err.message.replace('Output file already exists: public/', ''));
