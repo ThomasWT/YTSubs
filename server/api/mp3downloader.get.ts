@@ -6,7 +6,7 @@ import fs from 'fs'
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   if(query.delfile) {
-    const publicDir = './public';
+    const publicDir = process.cwd()+'/public';
     fs.readdir(publicDir, (err, files) => {
       if (err) {
         console.error('Error reading directory:', err);
