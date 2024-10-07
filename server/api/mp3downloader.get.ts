@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
       const downloadResult = await downloader.downloadSong(decodeURIComponent(query.url));
       return downloadResult.toString().replace('public/', '');
     } catch (err) {
-
+/* 
       const fileStream = createReadStream('./public/'+err.message.replace('Output file already exists: public/', ''));
       // Delete the file from ./public after streaming
       fileStream.on('close', () => {
@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
             console.log('File deleted successfully');
           }
         });
-      });
+      }); */
       return err.message.replace('Output file already exists: public/', '');
     }
   }
