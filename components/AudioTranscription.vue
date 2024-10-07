@@ -21,6 +21,15 @@
           {{ loading ? 'Transcribing...' : 'Transcribe Audio' }}
         </button>
       </div>
+      
+      <div v-if="estimatedProcessingTime" class="mb-4 text-sm text-gray-600">
+        <div class="mt-2 w-full  backdrop-blur-md bg-purple-300/10 rounded-full h-2.5">
+          <div class="bg-purple-600/70 h-2.5 rounded-full" :style="{ width: `${progressPercentage}%` }"></div>
+        </div>
+        <div class="mt-1 text-xs text-white">
+          Time elapsed: {{ formatTime(elapsedTime) }}
+        </div>
+      </div>
 
       <div v-if="loading" class="mb-4 flex justify-center items-center">
         <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
@@ -59,9 +68,20 @@ const srtContent = ref('')
 const loading = ref(false)
 const error = ref('') // Add this line
 const filename = ref('')
+const duration = ref(0)
 // Remove the progress ref as it's no longer needed
 // const progress = ref(0)
 
+const estimatedProcessingTime = computed(() => {
+  if (duration.value > 0) {
+    // Calculate estimated processing time
+    const estimatedSeconds = Math.round(duration.value * (84 / 76))
+    const minutes = Math.floor(estimatedSeconds / 60)
+    const seconds = estimatedSeconds % 60
+    return `Estimated processing time: ${minutes} minute${minutes !== 1 ? 's' : ''} and ${seconds} second${seconds !== 1 ? 's' : ''}`
+  }
+  return ''
+})
 
 const transcribeAudio = async (file: Blob) => {
   try {
@@ -85,8 +105,6 @@ const transcribeAudio = async (file: Blob) => {
   }
 };
 
-
-
 const downloadSRT = () => {
   if (srtContent.value) {
     const blob = new Blob([srtContent.value], { type: 'text/plain' });
@@ -101,13 +119,16 @@ const downloadSRT = () => {
   }
 };
 
-
 const handleFileUpload = async () => {
    filename.value = ''
   if(transcription.value) {
     try {
       loading.value = true
       error.value = '' // Clear any previous errors
+      processingStartTime.value = Date.now()
+      elapsedTime.value = 0
+      updateElapsedTime()
+
       const file = await $fetch('/api/mp3downloader', {
         query: {
           url: encodeURIComponent(transcription.value)
@@ -115,13 +136,22 @@ const handleFileUpload = async () => {
       });
       if (file) {
         try {
+                    
+          // Get the length of the MP3 file
+          const audio = new Audio('/' + file);
+          audio.addEventListener('loadedmetadata', () => {
+           duration.value = audio.duration;
+            console.log(`MP3 file length: ${duration.value} seconds`);
+          });
           const result = await transcribeAudio('/' + file);
-          filename.value = file
+          filename.value = file;
+
+
           if (result) {
             resultTranscript.value = result.text;
             srtContent.value = generateSRT(result.chunks);
           } else {
-            error.value = 'Transcription failed. Please try again.'
+            error.value = 'Transcription failed. Please try again.';
           }
         } catch (err) {
           error.value = 'Error during transcription: ' + (err.message || 'Unknown error')
@@ -157,5 +187,29 @@ const formatSRTTime = (seconds) => {
   const ms = date.getUTCMilliseconds().toString().padStart(3, '0');
   return `${hours}:${minutes}:${secs},${ms}`;
 };
+
+const progressPercentage = computed(() => {
+  if (duration.value > 0) {
+    const estimatedSeconds = Math.round(duration.value * (84 / 76))
+    return Math.min((elapsedTime.value / estimatedSeconds) * 100, 100)
+  }
+  return 0
+})
+
+const formatTime = (seconds) => {
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = Math.floor(seconds % 60)
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+}
+
+const updateElapsedTime = () => {
+  if (loading.value) {
+    elapsedTime.value = (Date.now() - processingStartTime.value) / 1000
+    requestAnimationFrame(updateElapsedTime)
+  }
+}
+
+const elapsedTime = ref(0)
+const processingStartTime = ref(0)
 
 </script>
