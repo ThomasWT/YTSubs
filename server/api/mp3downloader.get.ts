@@ -29,10 +29,10 @@ export default defineEventHandler(async (event) => {
     return { message: 'MP3 files deletion process initiated' };
   }
   if (query?.url) {
-    console.log(process.cwd+'/public')
+    console.log(process.cwd()+'/public')
     const downloader = new Downloader({
       getTags: false,
-      outputDir: process.cwd+'/public',
+      outputDir: process.cwd()+'/public',
     });
 
     try {
