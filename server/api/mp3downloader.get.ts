@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const headers = getHeaders(event)
   const config = useRuntimeConfig();
-    const pathing = process.env.NODE_ENV == 'development' ? process.cwd()+'/public' : '/home/thomas/caption-youtube/.output/public'
+    const pathing = process.env.NODE_ENV == 'development' ? process.cwd()+'/public' : '/var/www/ytsubs.thomaswt.com/uploads'
   if(query.delfile) {
     const publicDir = pathing;
     fs.readdir(publicDir, (err, files) => {
@@ -35,13 +35,13 @@ export default defineEventHandler(async (event) => {
   if (query?.url) {
     const downloader = new Downloader({
       getTags: false,
-      outputDir: process.cwd()+'/public'
+      outputDir: pathing
     });
 
     try {
       const downloadResult = await downloader.downloadSong(decodeURIComponent(query.url));
       const schema = headers["x-forwarded-proto"] || 'https';
-      return downloadResult.toString().replace(process.cwd()+'/public', config.domain);
+      return downloadResult.toString().replace(pathing, config.domain+'/uploads');
     } catch (err) {
 /* 
       const fileStream = createReadStream('./public/'+err.message.replace('Output file already exists: public/', ''));
