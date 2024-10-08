@@ -5,6 +5,7 @@ import fs from 'fs'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
+  const headers = getHeaders(event)
   if(query.delfile) {
     const publicDir = process.cwd()+'/public';
     fs.readdir(publicDir, (err, files) => {
@@ -29,7 +30,6 @@ export default defineEventHandler(async (event) => {
     return { message: 'MP3 files deletion process initiated' };
   }
   if (query?.url) {
-    console.log(process.cwd()+'/public')
     const downloader = new Downloader({
       getTags: false,
       outputDir: process.cwd()+'/public',
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
 
     try {
       const downloadResult = await downloader.downloadSong(decodeURIComponent(query.url));
-      return downloadResult.toString().replace(process.cwd()+'/public', 'https://ytsubs.thomaswt.com');
+      return downloadResult.toString().replace(process.cwd()+'/public', `${headers["x-forwarded-proto"]}://${headers.host}`);
     } catch (err) {
 /* 
       const fileStream = createReadStream('./public/'+err.message.replace('Output file already exists: public/', ''));
