@@ -25,5 +25,5 @@ jobs:
         script: |
           echo $WELCOME
           cd ${{ secrets.PROJECT_PATH }}
-          git pull && pnpm install && pnpm run build && cp -r /home/thomas/caption-youtube/node_modules/ffmpeg-static/ /home/thomas/caption-youtube/.output/server/node_modules && pm2 restart YTSubs
+          find . -type f -name "*.mp3" -exec rm -f {} \; && git pull && pnpm install && pnpm run build && cp -r /home/thomas/caption-youtube/node_modules/ffmpeg-static/ /home/thomas/caption-youtube/.output/server/node_modules && pm2 restart YTSubs
           echo $LASTSSH

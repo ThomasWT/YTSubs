@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
   if (query?.url) {
     const downloader = new Downloader({
       getTags: false,
-      outputDir: process.cwd()+'/public',
+      outputDir: process.env.NODE_ENV == 'development' ? process.cwd()+'/public' : '/home/thomas/caption-youtube/.output/public/',
     });
 
     try {
