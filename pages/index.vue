@@ -11,6 +11,7 @@
 useSeoMeta({
   title: 'YTSubs',
   description: 'Extract subtitles from YouTube videos using AI technology. Fast, accurate, and easy to use.',
+  ogImage: 'https://ytsubs.thomaswt.com/ytogimage.jpg',
   ogTitle: 'AI-Powered YouTube Subtitle Extractor | Get Video Captions Instantly',
   ogDescription: 'Transform YouTube video content into readable, searchable text. Perfect for content creators, researchers, and more.',
   twitterCard: 'summary_large_image',
