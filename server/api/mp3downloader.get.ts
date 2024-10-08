@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
 
     try {
       const downloadResult = await downloader.downloadSong(decodeURIComponent(query.url));
-      return downloadResult.toString().replace(process.cwd()+'/public', '');
+      return downloadResult.toString().replace(process.cwd()+'/public', 'https://ytsubs.thomaswt.com');
     } catch (err) {
 /* 
       const fileStream = createReadStream('./public/'+err.message.replace('Output file already exists: public/', ''));
