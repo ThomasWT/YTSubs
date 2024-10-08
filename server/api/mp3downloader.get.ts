@@ -35,13 +35,13 @@ export default defineEventHandler(async (event) => {
   if (query?.url) {
     const downloader = new Downloader({
       getTags: false,
-      outputDir: './public'
+      outputDir: process.cwd()+'/public'
     });
 
     try {
       const downloadResult = await downloader.downloadSong(decodeURIComponent(query.url));
       const schema = headers["x-forwarded-proto"] || 'https';
-      return downloadResult.toString().replace('public', config.domain);
+      return downloadResult.toString().replace(process.cwd()+'/public', config.domain);
     } catch (err) {
 /* 
       const fileStream = createReadStream('./public/'+err.message.replace('Output file already exists: public/', ''));
