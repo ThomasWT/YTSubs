@@ -155,7 +155,7 @@ const handleFileUpload = async () => {
       if (file) {
         try {
           // Get the file from IndexedDB
-          const audio = new Audio('/' + file);
+          const audio = new Audio(file);
 
           audio.addEventListener('loadedmetadata', async () => {
             duration.value = audio.duration;
@@ -166,7 +166,7 @@ const handleFileUpload = async () => {
               return;
             } else {
               // Use the file URL instead of the blob for transcription
-              const result = await transcribeAudio('/' + file);
+              const result = await transcribeAudio(file);
               filename.value = file;
 
               if (result) {
