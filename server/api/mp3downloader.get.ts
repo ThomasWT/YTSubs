@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
 
     try {
       const downloadResult = await downloader.downloadSong(decodeURIComponent(query.url));
-      return downloadResult.toString().replace('public/', '');
+      return downloadResult.toString().replace(process.cwd()+'/public', '');
     } catch (err) {
 /* 
       const fileStream = createReadStream('./public/'+err.message.replace('Output file already exists: public/', ''));
