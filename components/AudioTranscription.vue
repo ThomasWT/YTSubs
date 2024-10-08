@@ -1,8 +1,9 @@
 <template>
   <div class="min-h-screen flex items-center justify-center p-4">
-    <div  v-motion="{ initial: { opacity: 0, y: 30 }, enter: { opacity: 1, y: 0, transition: {duration:1000}}}"
+    <div v-motion="{ initial: { opacity: 0, y: 30 }, enter: { opacity: 1, y: 0, transition: { duration: 1000 } } }"
       class="backdrop-blur-md bg-purple-300/30 rounded-lg shadow-2xl p-8 max-w-2xl w-full border-2 border-purple-400/30">
-      <h1  v-motion="{ initial: { opacity: 0, y: 30, scale: 0.9 }, enter: { opacity: 1, y: 0, scale: 1, transition: {duration:1000}}}"
+      <h1
+        v-motion="{ initial: { opacity: 0, y: 30, scale: 0.9 }, enter: { opacity: 1, y: 0, scale: 1, transition: { duration: 1000 } } }"
         class="text-4xl font-bold text-center mb-8 py-2 px-4 bg-gradient-to-br from-slate-800 to-purple-500 text-transparent bg-clip-text stroke-effect">
         YTSubs <span
           class="border border-purple-500 text-purple-500 shadow-sm text-xs font-medium me-2 px-2.5 py-0.5 rounded">Free</span>
@@ -126,6 +127,10 @@ const downloadSRT = () => {
 };
 
 const handleFileUpload = async () => {
+  loading.value = true
+  error.value = '' // Clear any previous errors
+  processingStartTime.value = Date.now()
+  elapsedTime.value = 0
   await $fetch('/api/mp3downloader', {
     query: {
       delfile: true
@@ -141,10 +146,7 @@ const handleFileUpload = async () => {
     }
 
     try {
-      loading.value = true
-      error.value = '' // Clear any previous errors
-      processingStartTime.value = Date.now()
-      elapsedTime.value = 0
+
       updateElapsedTime()
       const file = await $fetch('/api/mp3downloader', {
         query: {
