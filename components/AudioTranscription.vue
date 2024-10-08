@@ -1,11 +1,11 @@
 <template>
   <div class="min-h-screen flex items-center justify-center p-4">
     <div v-motion="{ initial: { opacity: 0, y: 30, }, enter: { opacity: 1, y: 0, transition: { duration: 1000 } } }"
-      class="backdrop-blur-md bg-purple-300/30 rounded-lg shadow-2xl p-8 max-w-2xl w-full border-2 border-purple-400/30">
+      class="cardcontainer backdrop-blur-md bg-purple-300/30 rounded-lg shadow-2xl p-8 max-w-2xl w-full border-2 border-purple-400/30">
       <h1
         v-motion="{ initial: { opacity: 0, y: 30, scale: 0.9, filter: 'blur(10px)' }, enter: { opacity: 1, y: 0, scale: 1,filter: 'blur(0px)',  transition: { duration: 1000 } } }"
         class="text-4xl font-bold text-center mb-8 py-2 px-4 bg-gradient-to-br from-slate-800 to-purple-500 text-transparent bg-clip-text stroke-effect">
-        YTSubs <span  v-motion="{ initial: { opacity: 0, y: 30 }, enter: { opacity: 1, y: 0, transition: { duration: 500, delay: 500 } } }"
+        YTSubs <span  v-motion="{ initial: { opacity: 0, y: 60 }, enter: { opacity: 1, y: 0, transition: { duration: 500, delay: 500 } } }"
           class="border border-purple-500 text-purple-500 shadow-sm text-xs font-medium me-2 px-2.5 py-0.5 rounded">Free</span>
       </h1>
 
@@ -250,6 +250,22 @@ const updateElapsedTime = () => {
 const elapsedTime = ref(0)
 const processingStartTime = ref(0)
 
+onMounted(() => {
+  const updateCursor = ({ x, y }) => {
+  const cardContainer = document.querySelector('.cardcontainer')
+  if (cardContainer) {
+    const rect = cardContainer.getBoundingClientRect()
+    const distanceFromTop = rect.top
+    const distanceFromLeft = rect.left
+    document.documentElement.style.setProperty('--x', x-distanceFromLeft)
+    document.documentElement.style.setProperty('--y', y-distanceFromTop)
+  }
+
+}
+
+document.body.addEventListener('pointermove', updateCursor)
+})
+
 </script>
 
 <style>
@@ -266,5 +282,38 @@ const processingStartTime = ref(0)
 .slide-up-leave-to {
   opacity: 0;
   transform: translateY(-0.7rem);
+}
+
+.cardcontainer:hover {
+  --active: 1;
+}
+
+.cardcontainer:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at calc(var(--x) * 1px) calc(var(--y) * 1px), hsla(293, 84%, 55%, 0.142), transparent 15vmin);
+  background-attachment: fixed;
+  opacity: var(--active, 0);
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.cardcontainer:before {
+  border-radius: 6px;
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at calc(var(--x) * 1px) calc(var(--y) * 1px), hsl(0 0% 100% / 0.5), transparent 15vmin),
+    transparent;
+  background-attachment: fixed;
+  pointer-events: none;
+  mask:
+    linear-gradient(rgb(192 132 252 / 0.3), rgb(192 132 252 / 0.3)) 50% 0 / 100% 4px no-repeat,
+    linear-gradient(rgb(192 132 252 / 0.3), rgb(192 132 252 / 0.3)) 50% 100% / 100% 4px no-repeat,
+    linear-gradient(rgb(192 132 252 / 0.3), rgb(192 132 252 / 0.3)) 0 50% / 4px 100% no-repeat,
+    linear-gradient(rgb(192 132 252 / 0.3), rgb(192 132 252 / 0.3)) 100% 50% / 4px 100% no-repeat;
 }
 </style>
