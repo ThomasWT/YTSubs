@@ -6,10 +6,9 @@
 
 <script lang="ts" setup>
 // Import the useSeoMeta composable
-import { useSeoMeta } from '#imports'
 
 // Define SEO metadata
-useServerSeoMeta({
+useSeoMeta({
   title: 'YTSubs',
   description: 'Extract subtitles from YouTube videos using AI technology. Fast, accurate, and easy to use.',
   ogTitle: 'AI-Powered YouTube Subtitle Extractor | Get Video Captions Instantly',
