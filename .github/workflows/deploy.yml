@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main  # This workflow will run when changes are pushed to the main branch
+#find . -type f -name "*.mp3" -exec rm -f {} \; && git pull && pnpm install && pnpm run build && cp -r /home/thomas/caption-youtube/node_modules/ffmpeg-static/ /home/thomas/caption-youtube/.output/server/node_modules && pm2 restart YTSubs
 
 jobs:
   deploy:
@@ -12,18 +13,37 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+
+    - name: Install pnpm
+      run: npm install -g pnpm
+
+    - name: Install packages
+      run: pnpm install
+
+    - name: Build
+      run: pnpm run build
+
+    - name: Copy ffmpeg-static
+      run: cp -r ./node_modules/ffmpeg-static/ .output/server/node_modules
+
     - name: Deploy to server
-      uses: cross-the-world/ssh-pipeline@master
-      env:
-        WELCOME: "Deployment started"
-        LASTSSH: "Deployment finished"
+      uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.SERVER_IP }}
-        user: ${{ secrets.SERVER_USER }}
-        pass: ${{ secrets.SERVER_PASSWORD }}
-        connect_timeout: 10s
+        username: ${{ secrets.SERVER_USER }}
+        password: ${{ secrets.SERVER_PASSWORD }}
+        source: ".output"
+        target: "${{ secrets.PROJECT_PATH }}"
+
+    - name: Restart PM2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SERVER_USER }}
+        password: ${{ secrets.SERVER_PASSWORD }}
         script: |
-          echo $WELCOME
           cd ${{ secrets.PROJECT_PATH }}
-          find . -type f -name "*.mp3" -exec rm -f {} \; && git pull && pnpm install && pnpm run build && cp -r /home/thomas/caption-youtube/node_modules/ffmpeg-static/ /home/thomas/caption-youtube/.output/server/node_modules && pm2 restart YTSubs
-          echo $LASTSSH
+          find . -type f -name "*.mp3" -exec rm -f {} \;
+          pm2 restart YTSubs
