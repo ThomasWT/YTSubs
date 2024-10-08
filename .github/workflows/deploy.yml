@@ -12,17 +12,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Install SSH key
-      uses: shimataro/ssh-key-action@v2
+    - name: Setup SSH
+      uses: kielabokkie/ssh-key-and-known-hosts-action@v1
       with:
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        known_hosts: ${{ secrets.KNOWN_HOSTS }}
-
-    - name: Add Server to Known Hosts
-      run: |
-        mkdir -p ~/.ssh
-        ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+        ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+        ssh-host: ${{ secrets.SERVER_IP }}
 
     - name: Deploy to server
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "cd ${{ secrets.PROJECT_PATH }} && ./plep.sh"
+        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "cd ${{ secrets.PROJECT_PATH }} && ./plep.sh"
