@@ -18,6 +18,11 @@ jobs:
         key: ${{ secrets.SERVER_SSH_KEY }}
         known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
+    - name: Add Server to Known Hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
     - name: Deploy to server
       run: |
-        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "cd ${{ secrets.PROJECT_PATH }} && ./plep.sh"
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "cd ${{ secrets.PROJECT_PATH }} && ./plep.sh"
