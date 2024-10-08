@@ -5,7 +5,11 @@ export default defineNuxtConfig({
   ssr:false,
   modules: ['nuxt-workers', '@nuxtjs/tailwindcss', '@vueuse/motion/nuxt'],
   runtimeConfig: {
-    domain: process.env.NODE_ENV == 'development' ? 'http://localhost:3000' : 'https://ytsubs.thomaswt.com'
+    domain: process.env.NODE_ENV == 'development' ? 'http://localhost:3000' : 'https://ytsubs.thomaswt.com',
+    public: {
+      posthogPublicKey: 'phc_6KKOKOdFbfQSnmHW6OTGW9DU1qwhfuXiLtbqiWBdxzV',
+      posthogHost: 'https://eu.i.posthog.com'
+    }
   },
   // or sourcemap: true
   sourcemap: {

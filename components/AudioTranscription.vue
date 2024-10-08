@@ -79,8 +79,12 @@ const loading = ref(false)
 const error = ref('') // Add this line
 const filename = ref('')
 const duration = ref(0)
-// Remove the progress ref as it's no longer needed
-// const progress = ref(0)
+const { $posthog } = useNuxtApp()
+const posthog = $posthog()
+const route = useRoute();
+posthog.capture('$pageview', {
+        current_url: route.fullPath
+});
 
 const estimatedProcessingTime = computed(() => {
   if (duration.value > 0) {
@@ -148,7 +152,7 @@ const handleFileUpload = async () => {
     }
 
     try {
-
+      posthog.capture('Transcribing', { property: transcription.value })
       updateElapsedTime()
       
       const file = await $fetch('/api/mp3downloader', {
