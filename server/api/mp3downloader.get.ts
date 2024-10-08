@@ -37,7 +37,8 @@ export default defineEventHandler(async (event) => {
 
     try {
       const downloadResult = await downloader.downloadSong(decodeURIComponent(query.url));
-      return downloadResult.toString().replace(process.cwd()+'/public', `${headers["x-forwarded-proto"]}://${headers.host}`);
+      const schema = headers["x-forwarded-proto"] || 'https';
+      return downloadResult.toString().replace(process.cwd()+'/public', `${schema}://${headers.host}`);
     } catch (err) {
 /* 
       const fileStream = createReadStream('./public/'+err.message.replace('Output file already exists: public/', ''));
