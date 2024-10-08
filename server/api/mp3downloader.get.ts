@@ -30,16 +30,17 @@ export default defineEventHandler(async (event) => {
     
     return { message: 'MP3 files deletion process initiated' };
   }
+  const pathing = process.env.NODE_ENV == 'development' ? process.cwd()+'/public' : '/home/thomas/caption-youtube/.output/public'
   if (query?.url) {
     const downloader = new Downloader({
       getTags: false,
-      outputDir: process.env.NODE_ENV == 'development' ? process.cwd()+'/public' : '/home/thomas/caption-youtube/.output/public/',
+      outputDir: pathing
     });
 
     try {
       const downloadResult = await downloader.downloadSong(decodeURIComponent(query.url));
       const schema = headers["x-forwarded-proto"] || 'https';
-      return downloadResult.toString().replace(process.cwd()+'/public', config.domain);
+      return downloadResult.toString().replace(pathing, config.domain);
     } catch (err) {
 /* 
       const fileStream = createReadStream('./public/'+err.message.replace('Output file already exists: public/', ''));
