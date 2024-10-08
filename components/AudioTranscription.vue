@@ -156,7 +156,6 @@ const handleFileUpload = async () => {
       updateElapsedTime()
       
       const file = await $fetch('/api/mp3downloader', {
-        headers: useRequestHeaders(),
         query: {
           url: encodeURIComponent(transcription.value)
         },
