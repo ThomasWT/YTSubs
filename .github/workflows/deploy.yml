@@ -12,12 +12,20 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Setup SSH
-      uses: kielabokkie/ssh-key-and-known-hosts-action@v1
-      with:
-        ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
-        ssh-host: ${{ secrets.SERVER_IP }}
-
     - name: Deploy to server
-      run: |
-        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "cd ${{ secrets.PROJECT_PATH }} && ./plep.sh"
+      uses: cross-the-world/ssh-scp-ssh-pipelines@latest
+      env:
+        WELCOME: "Deployment started"
+        LASTSSH: "Deployment finished"
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        user: ${{ secrets.SERVER_USER }}
+        pass: ${{ secrets.SERVER_PASSWORD }}
+        connect_timeout: 10s
+        first_ssh: |
+          echo $WELCOME
+          cd ${{ secrets.PROJECT_PATH }}
+        last_ssh: |
+          cd ${{ secrets.PROJECT_PATH }}
+          ./plep.sh
+          echo $LASTSSH
