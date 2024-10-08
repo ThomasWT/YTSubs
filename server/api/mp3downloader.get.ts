@@ -6,6 +6,7 @@ import fs from 'fs'
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const headers = getHeaders(event)
+  const config = useRuntimeConfig();
   if(query.delfile) {
     const publicDir = process.cwd()+'/public';
     fs.readdir(publicDir, (err, files) => {
@@ -38,7 +39,7 @@ export default defineEventHandler(async (event) => {
     try {
       const downloadResult = await downloader.downloadSong(decodeURIComponent(query.url));
       const schema = headers["x-forwarded-proto"] || 'https';
-      return downloadResult.toString().replace(process.cwd()+'/public', `${schema}://${headers.host}`);
+      return downloadResult.toString().replace(process.cwd()+'/public', config.domain);
     } catch (err) {
 /* 
       const fileStream = createReadStream('./public/'+err.message.replace('Output file already exists: public/', ''));

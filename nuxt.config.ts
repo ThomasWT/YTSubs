@@ -4,6 +4,9 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   ssr:false,
   modules: ['nuxt-workers', '@nuxtjs/tailwindcss', '@vueuse/motion/nuxt'],
+  runtimeConfig: {
+    domain: process.env.NODE_ENV == 'development' ? 'http://localhost:3000' : 'https://ytsubs.thomaswt.com'
+  },
   // or sourcemap: true
   sourcemap: {
     server: true,
