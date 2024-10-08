@@ -13,7 +13,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Deploy to server
-      uses: cross-the-world/ssh-scp-ssh-pipelines@latest
+      uses: cross-the-world/ssh-pipeline@master
       env:
         WELCOME: "Deployment started"
         LASTSSH: "Deployment finished"
@@ -22,10 +22,8 @@ jobs:
         user: ${{ secrets.SERVER_USER }}
         pass: ${{ secrets.SERVER_PASSWORD }}
         connect_timeout: 10s
-        first_ssh: |
+        script: |
           echo $WELCOME
-          cd ${{ secrets.PROJECT_PATH }}
-        last_ssh: |
           cd ${{ secrets.PROJECT_PATH }}
           ./plep.sh
           echo $LASTSSH
