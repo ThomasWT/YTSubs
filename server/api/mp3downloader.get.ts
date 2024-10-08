@@ -7,8 +7,9 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const headers = getHeaders(event)
   const config = useRuntimeConfig();
+    const pathing = process.env.NODE_ENV == 'development' ? process.cwd()+'/public' : '/home/thomas/caption-youtube/.output/public'
   if(query.delfile) {
-    const publicDir = process.cwd()+'/public';
+    const publicDir = pathing;
     fs.readdir(publicDir, (err, files) => {
       if (err) {
         console.error('Error reading directory:', err);
@@ -30,7 +31,7 @@ export default defineEventHandler(async (event) => {
     
     return { message: 'MP3 files deletion process initiated' };
   }
-  const pathing = process.env.NODE_ENV == 'development' ? process.cwd()+'/public' : '/home/thomas/caption-youtube/.output/public'
+
   if (query?.url) {
     const downloader = new Downloader({
       getTags: false,
