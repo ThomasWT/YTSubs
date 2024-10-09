@@ -38,10 +38,10 @@ export default defineEventHandler(async (event) => {
       outputDir: pathing
     });
 
+    const getAudioFrom = process.env.NODE_ENV == 'development' ? config.domain : config.domain+'/uploads'
     try {
       const downloadResult = await downloader.downloadSong(decodeURIComponent(query.url));
-      const schema = headers["x-forwarded-proto"] || 'https';
-      return downloadResult.toString().replace(pathing, config.domain+'/uploads');
+      return downloadResult.toString().replace(pathing, config.domain);
     } catch (err) {
 /* 
       const fileStream = createReadStream('./public/'+err.message.replace('Output file already exists: public/', ''));

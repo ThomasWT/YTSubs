@@ -1,6 +1,8 @@
 <template>
   <div>
-    <AudioTranscription></AudioTranscription>
+    <ClientOnly>
+      <AudioTranscription></AudioTranscription>
+    </ClientOnly>
   </div>
 </template>
 
@@ -8,7 +10,7 @@
 // Import the useSeoMeta composable
 
 // Define SEO metadata
-useSeoMeta({
+useServerSeoMeta({
   title: 'YTSubs',
   description: 'Extract subtitles from YouTube videos using AI technology. Fast, accurate, and easy to use.',
   ogImage: 'https://ytsubs.thomaswt.com/ytogimage.jpg',
