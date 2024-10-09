@@ -2,19 +2,28 @@
   <div class="min-h-screen flex items-center justify-center p-4">
     <div v-motion="{ initial: { opacity: 0, y: 30, }, enter: { opacity: 1, y: 0, transition: { duration: 1000 } } }"
       class="cardcontainer backdrop-blur-md bg-purple-300/30 rounded-lg shadow-2xl p-8 max-w-2xl w-full border-2 border-purple-400/30">
-      <h1
-        v-motion="{ initial: { opacity: 0, y: 30, scale: 0.9, filter: 'blur(10px)' }, enter: { opacity: 1, y: 0, scale: 1,filter: 'blur(0px)',  transition: { duration: 1000 } } }"
-        class="text-4xl font-bold text-center mb-8 py-2 px-4 bg-gradient-to-br from-slate-800 to-purple-500 text-transparent bg-clip-text stroke-effect">
-        YTSubs <span  v-motion="{ initial: { opacity: 0, y: 60 }, enter: { opacity: 1, y: 0, transition: { duration: 500, delay: 500 } } }"
-          class="border border-purple-500 text-purple-500 shadow-sm text-xs font-medium me-2 px-2.5 py-0.5 rounded">Free</span>
-      </h1>
+      <div class="flex flex-col justify-center  items-center  mb-8">
+        <h1
+          v-motion="{ initial: { opacity: 0, y: 30, scale: 0.9, filter: 'blur(10px)' }, enter: { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', transition: { duration: 1000 } } }"
+          class="text-4xl font-bold text-center py-2 px-4 bg-gradient-to-br from-slate-800 to-purple-500 text-transparent bg-clip-text stroke-effect">
+          YTSubs <span
+            v-motion="{ initial: { opacity: 0, y: 60 }, enter: { opacity: 1, y: 0, transition: { duration: 500, delay: 500 } } }"
+            class="border border-purple-500 text-purple-500 shadow-sm text-xs font-medium me-2 px-2.5 py-0.5 rounded">Free</span>
+        </h1>
 
-      <div v-motion="{ initial: { opacity: 0, y: 30 }, enter: { opacity: 1, y: 0, transition: { duration: 1000, delay: 0 } } }" class="mb-6">
+        <p v-motion="{ initial: { opacity: 0, y: 30, scale: 0.9, filter: 'blur(10px)' }, enter: { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', transition: { duration: 1000, delay: 100 } } }"
+          class="text-purple-500 tracking-wider">Transcribe a video with your browser</p>
+      </div>
+      <div
+        v-motion="{ initial: { opacity: 0, y: 30 }, enter: { opacity: 1, y: 0, transition: { duration: 1000, delay: 0 } } }"
+        class="mb-6">
         <input v-model="transcription" type="text" placeholder="Enter YouTube URL"
           class="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none bg-white placeholder-purple-400" />
       </div>
 
-      <div v-motion="{ initial: { opacity: 0, y: 20 }, enter: { opacity: 1, y: 0, transition: { duration: 1200, delay: 100 } } }" class="mb-6">
+      <div
+        v-motion="{ initial: { opacity: 0, y: 20 }, enter: { opacity: 1, y: 0, transition: { duration: 1200, delay: 100 } } }"
+        class="mb-6">
         <button @click="handleFileUpload"
           class="w-full bg-purple-900/50 backdrop-blur-md text-white py-2 px-4 rounded-md hover:bg-purple-900/40 transition duration-300 border border-white/30 shadow-lg"
           :disabled="loading">
@@ -83,7 +92,7 @@ const { $posthog } = useNuxtApp()
 const posthog = $posthog()
 const route = useRoute();
 posthog.capture('$pageview', {
-        current_url: route.fullPath
+  current_url: route.fullPath
 });
 
 const estimatedProcessingTime = computed(() => {
@@ -154,7 +163,7 @@ const handleFileUpload = async () => {
     try {
       posthog.capture('Transcribing', { property: transcription.value })
       updateElapsedTime()
-      
+
       const file = await $fetch('/api/mp3downloader', {
         query: {
           url: encodeURIComponent(transcription.value)
@@ -258,18 +267,18 @@ const processingStartTime = ref(0)
 
 onMounted(() => {
   const updateCursor = ({ x, y }) => {
-  const cardContainer = document.querySelector('.cardcontainer')
-  if (cardContainer) {
-    const rect = cardContainer.getBoundingClientRect()
-    const distanceFromTop = rect.top
-    const distanceFromLeft = rect.left
-    document.documentElement.style.setProperty('--x', x-distanceFromLeft)
-    document.documentElement.style.setProperty('--y', y-distanceFromTop)
+    const cardContainer = document.querySelector('.cardcontainer')
+    if (cardContainer) {
+      const rect = cardContainer.getBoundingClientRect()
+      const distanceFromTop = rect.top
+      const distanceFromLeft = rect.left
+      document.documentElement.style.setProperty('--x', x - distanceFromLeft)
+      document.documentElement.style.setProperty('--y', y - distanceFromTop)
+    }
+
   }
 
-}
-
-document.body.addEventListener('pointermove', updateCursor)
+  document.body.addEventListener('pointermove', updateCursor)
 })
 
 </script>
