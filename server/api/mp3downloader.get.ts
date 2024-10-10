@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
     const getAudioFrom = process.env.NODE_ENV == 'development' ? config.domain : config.domain+'/uploads'
     try {
       const downloadResult = await downloader.downloadSong(decodeURIComponent(query.url));
-      return downloadResult.toString().replace(pathing, config.domain);
+      return downloadResult.toString().replace(pathing, getAudioFrom);
     } catch (err) {
 /* 
       const fileStream = createReadStream('./public/'+err.message.replace('Output file already exists: public/', ''));
