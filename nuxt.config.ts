@@ -4,10 +4,12 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ['nuxt-workers', '@nuxtjs/tailwindcss', '@vueuse/motion/nuxt', '@nuxt/fonts'],
   runtimeConfig: {
-    domain: process.env.NODE_ENV == 'development' ? 'http://localhost:3000' : 'https://ytsubs.thomaswt.com',
+    domain: process.env.DOMAIN,
+    path_to_store_temp_files: process.env.PATH_TO_STORE_TEMP_FILES,
     public: {
-      posthogPublicKey: 'phc_6KKOKOdFbfQSnmHW6OTGW9DU1qwhfuXiLtbqiWBdxzV',
-      posthogHost: 'https://eu.i.posthog.com'
+      path_to_download_files: process.env.PATH_TO_DOWNLOAD_FILES,
+      posthogPublicKey: process.env.POSTHOG_PUBLIC_KEY,
+      posthogHost: process.env.POSTHOG_HOST
     }
   },
   // or sourcemap: true

@@ -17,7 +17,9 @@
         "outputCapture": "std",
         "program": "${workspaceFolder}/node_modules/nuxi/bin/nuxi.mjs",
         "args": [
-          "dev"
+          "dev",
+          "--dotenv",
+          ".env.local"
         ],
       }
     ],
