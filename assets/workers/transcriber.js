@@ -5,7 +5,6 @@ env.allowLocalModels = false
 
 self.addEventListener('message', async (e) => {
     console.log("In worker (public): received data: "+ e)
-
     const transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-small')
     const plep = await transcriber(e.data, {
       // The length of audio chunks to process at a time (in seconds)

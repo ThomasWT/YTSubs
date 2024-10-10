@@ -1,6 +1,8 @@
 import { Downloader } from 'ytdl-mp3';
 import { join } from 'path';
 import fs from 'fs/promises';
+import ffmpeg from "fluent-ffmpeg";
+
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
@@ -61,7 +63,26 @@ async function handleMp3Download(url: string, outputDir: string, config: any): P
 
     // Return the path to the downloaded file, combining pathToDownloadFiles with the filename
     const filename = downloadResult.toString().split('/').pop();
-    return `${filename}`;
+
+    await new Promise(async (resolve, reject) => {
+      ffmpeg(outputDir+'/'+filename)
+        .toFormat("wav")
+        .audioFrequency(16000)  // Set sample rate to 16000 Hz
+        .outputOptions('-acodec pcm_f32le')  // Set bit depth to 32-bit floating point
+        .on("error", (err) => {
+          reject(err);
+        })
+        .on("end", () => {
+          resolve();
+        })
+        .save(outputDir+'/'+filename.replace('mp3', 'wav'));
+    });
+
+    let buffer = Buffer.from(await fetch(config.domain+'/'+filename.replace('mp3', 'wav')).then(x => x.arrayBuffer()))
+
+   
+
+    return JSON.stringify({name: filename, buffer: buffer, url: '/'+filename.replace('mp3', 'wav')});
   } catch (err: any) {
     console.error('Error downloading MP3:', err);
 

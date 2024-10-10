@@ -78,7 +78,7 @@
 <script setup lang="ts">
 import { pipeline, env } from '@xenova/transformers'
 import transcriberWorker from '../assets/workers/transcriber?worker'
-import {WaveFile} from 'wavefile';
+import { WaveFile } from 'wavefile';
 // Configure transformers environment
 env.allowLocalModels = false
 // State
@@ -107,76 +107,69 @@ posthog?.capture('$pageview', {
 // Estimate time to process from a baseline
 const estimatedProcessingTime = computed(() => {
   if (duration.value > 0) {
-    const baselineDuration = 76 // 1 minute and 16 seconds in seconds
-    const baselineProcessingTime = 48 // 52 seconds to process
-    const estimatedSeconds = Math.round(duration.value * (baselineProcessingTime / baselineDuration))
-    const minutes = Math.floor(estimatedSeconds / 60)
-    const seconds = estimatedSeconds % 60
-    return `ETA: ${minutes} min${minutes !== 1 ? 's' : ''} and ${seconds} second${seconds !== 1 ? 's' : ''}`
+    // Data points
+    const durations = [7, 77, 240]; // in seconds
+    const processingTimes = [30, 58, 237]; // in seconds
+
+    // Calculate slope and intercept for linear regression
+    const n = durations.length;
+    const sumX = durations.reduce((a, b) => a + b, 0);
+    const sumY = processingTimes.reduce((a, b) => a + b, 0);
+    const sumXY = durations.reduce((sum, x, i) => sum + x * processingTimes[i], 0);
+    const sumXX = durations.reduce((sum, x) => sum + x * x, 0);
+
+    const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+    const intercept = (sumY - slope * sumX) / n;
+
+    // Estimate processing time
+    const estimatedSeconds = Math.round(slope * duration.value + intercept);
+    const minutes = Math.floor(estimatedSeconds / 60);
+    const seconds = estimatedSeconds % 60;
+
+    return minutes > 0
+      ? `ETA: ${minutes} min${minutes !== 1 ? 's' : ''} and ${seconds} second${seconds !== 1 ? 's' : ''}`
+      : `ETA: ${seconds} second${seconds !== 1 ? 's' : ''}`;
   }
-  return ''
-})
+  return '';
+});
 
+const formatArrayBuffer = async (url) => {
+   // Fetch the audio data as an ArrayBuffer
+   const response = await fetch(url);
+      const arrayBuffer = await response.arrayBuffer();
 
-const convertSampels = (waveFile) => {
-  
+      // Create a Uint8Array from the ArrayBuffer
+      let audioData = new Uint8Array(arrayBuffer);
 
-  if (!waveFile || !waveFile.wavData || !waveFile.sampleRate) {
-      throw new Error('Invalid response from server')
-    }
+      // Read .wav file and convert it to required format
+      let wav = new WaveFile(audioData);
+      wav.toBitDepth('32f'); // Pipeline expects input as a Float32Array
+      wav.toSampleRate(16000); // Whisper expects audio with a sampling rate of 16000
+      audioData = wav.getSamples();
 
-    // Decode the base64 string to an ArrayBuffer
-    const binaryString = atob(waveFile.wavData)
-    const len = binaryString.length
-    const bytes = new Uint8Array(len)
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binaryString.charCodeAt(i)
-    }
+      if (Array.isArray(audioData)) {
+        if (audioData.length > 1) {
+          const SCALING_FACTOR = Math.sqrt(2);
 
-    console.log('Uint8Array length:', bytes.length)
+          // Merge channels (into first channel to save memory)
+          for (let i = 0; i < audioData[0].length; ++i) {
+            audioData[0][i] = SCALING_FACTOR * (audioData[0][i] + audioData[1][i]) / 2;
+          }
+        }
 
-    // Parse WAV header and extract audio data
-    const dataView = new DataView(bytes.buffer)
-    const format = String.fromCharCode(...bytes.slice(0, 4))
-    if (format !== 'RIFF') {
-      throw new Error('Invalid WAV format')
-    }
-
-    let offset = 12 // Skip RIFF header
-    while (true) {
-      const chunkType = String.fromCharCode(...bytes.slice(offset, offset + 4))
-      const chunkSize = dataView.getUint32(offset + 4, true)
-      if (chunkType === 'data') {
-        offset += 8 // Skip chunk header
-        break
+        // Select first channel
+        return audioData = audioData[0];
       }
-      offset += 8 + chunkSize
-    }
-
-    // Extract audio samples
-    const samples = new Float32Array((bytes.length - offset) / 4)
-    for (let i = 0; i < samples.length; i++) {
-      samples[i] = dataView.getFloat32(offset + i * 4, true)
-    }
-    return samples
 }
 
 const testWorkerProcessing = async (filepath) => {
   try {
-    console.log('Requesting audio data for:', filepath)
-    const response = await $fetch('/api/getprocessedaudio', {
-      headers: useRequestHeaders(),
-      query: {
-        url: encodeURIComponent(filepath)
-      }
-    })
-
-
-
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const worker = new transcriberWorker()
 
-      worker.postMessage(convertSampels(response))
+    const audioData = await formatArrayBuffer(filepath)
+
+      worker.postMessage(audioData)
       worker.addEventListener('message', (e) => {
         if (e) {
           resolve(e.data)
@@ -202,20 +195,20 @@ const getAudioData = async (url) => {
 const transcribeAudio = async (filepath: string): Promise<any> => {
   try {
     return await testWorkerProcessing(filepath)
-/*     const transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-small')
-    return await transcriber(filepath, {
-      // The length of audio chunks to process at a time (in seconds)
-      // Shorter chunks use less memory but may reduce accuracy
-      chunk_length_s: 120,
-
-      // The stride between chunks (in seconds)
-      // Smaller stride increases overlap, potentially improving accuracy at the cost of processing time
-      stride_length_s: 20,
-
-      // Whether to return timestamps for each transcribed segment
-      // Useful for generating subtitles or aligning text with audio
-      return_timestamps: true,
-    }) */
+    /*     const transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-small')
+        return await transcriber(filepath, {
+          // The length of audio chunks to process at a time (in seconds)
+          // Shorter chunks use less memory but may reduce accuracy
+          chunk_length_s: 120,
+    
+          // The stride between chunks (in seconds)
+          // Smaller stride increases overlap, potentially improving accuracy at the cost of processing time
+          stride_length_s: 20,
+    
+          // Whether to return timestamps for each transcribed segment
+          // Useful for generating subtitles or aligning text with audio
+          return_timestamps: true,
+        }) */
   } catch (err) {
     console.error('Transcription error:', err)
     return null
@@ -240,7 +233,7 @@ const handleFileUpload = async () => {
   // Set loading state and reset error
   loading.value = true
   error.value = ''
-  
+  duration.value = 0
   // Initialize processing time tracking
   processingStartTime.value = Date.now()
   elapsedTime.value = 0
@@ -267,7 +260,8 @@ const handleFileUpload = async () => {
     posthog?.capture('Transcribing', { property: transcription.value })
 
     // Download audio from the provided URL
-    filename.value = await downloadAudio(transcription.value)
+    const filestuff = JSON.parse(await downloadAudio(transcription.value))
+    filename.value = filestuff.name
     if (!filename.value) {
       error.value = 'Failed to download audio. Please check the URL and try again.'
       loading.value = false
@@ -275,7 +269,7 @@ const handleFileUpload = async () => {
     }
 
     // Process the downloaded audio file
-    await processAudioFile(pathToDownloadFiles+filename.value)
+    await processAudioFile(filestuff)
   } catch (err: any) {
     // Handle any errors that occur during the process
     error.value = `File upload error: ${err.statusMessage || 'Unknown error'}`
@@ -302,7 +296,7 @@ const downloadAudio = async (url: string): Promise<string> => {
 // Function to process the downloaded audio file
 const processAudioFile = async (filepath: string) => {
   // Create a new Audio object with the given file path
-  const audio = new Audio(filepath)
+  const audio = new Audio(filepath.url)
 
   // Add an event listener for when the audio metadata is loaded
   audio.addEventListener('loadedmetadata', async () => {
@@ -318,7 +312,7 @@ const processAudioFile = async (filepath: string) => {
     }
 
     // Attempt to transcribe the audio file
-    const result = await transcribeAudio(filepath)
+    const result = await transcribeAudio(filepath.url)
 
     if (result) {
       // If transcription is successful, update the result and SRT content
