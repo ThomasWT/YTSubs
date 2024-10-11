@@ -25,6 +25,20 @@ jobs:
     - name: Build
       run: pnpm run build --dotenv .env.production
 
+    - name: Debug Environment Variables
+      run: |
+        echo "DOMAIN: $DOMAIN"
+        echo "PATH_TO_STORE_TEMP_FILES: $PATH_TO_STORE_TEMP_FILES"
+        echo "PATH_TO_DOWNLOAD_FILES: $PATH_TO_DOWNLOAD_FILES"
+        echo "POSTHOG_PUBLIC_KEY: $POSTHOG_PUBLIC_KEY"
+        echo "POSTHOG_HOST: $POSTHOG_HOST"
+      env:
+        DOMAIN: ${{ secrets.DOMAIN }}
+        PATH_TO_STORE_TEMP_FILES: ${{ secrets.PATH_TO_STORE_TEMP_FILES }}
+        PATH_TO_DOWNLOAD_FILES: ${{ secrets.PATH_TO_DOWNLOAD_FILES }}
+        POSTHOG_PUBLIC_KEY: ${{ secrets.POSTHOG_PUBLIC_KEY }}
+        POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
+
     - name: Copy binaries
       run: cp -r ./node_modules/ffmpeg-static/ .output/server/node_modules && cp -r ./node_modules/fluent-ffmpeg/ .output/server/node_modules
 
