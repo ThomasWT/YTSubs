@@ -21,9 +21,9 @@ jobs:
 
     - name: Install packages
       run: pnpm install
-
+      
     - name: Build
-      run: pnpm run build --dotenv .env.production
+      run: pnpm run build
 
     - name: Copy binaries
       run: cp -r ./node_modules/ffmpeg-static/ .output/server/node_modules && cp -r ./node_modules/fluent-ffmpeg/ .output/server/node_modules
