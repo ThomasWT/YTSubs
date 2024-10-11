@@ -296,7 +296,7 @@ const downloadAudio = async (url: string): Promise<string> => {
 // Function to process the downloaded audio file
 const processAudioFile = async (filepath: string) => {
   // Create a new Audio object with the given file path
-  const audio = new Audio(filepath.url)
+  const audio = new Audio(process.env.NODE_ENV == 'development' ? '' : config.public.path_to_download_files+filepath.url.replace)
 
   // Add an event listener for when the audio metadata is loaded
   audio.addEventListener('loadedmetadata', async () => {

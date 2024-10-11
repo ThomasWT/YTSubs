@@ -6,7 +6,7 @@ import ffmpeg from "fluent-ffmpeg";
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const config = useRuntimeConfig();
-  console.log(config)
+  
   // Determine the output directory based on the environment
   const pathToStoreFiles = config.path_to_store_temp_files
 
