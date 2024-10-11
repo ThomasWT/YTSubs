@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@huggingface/transformers": "^3.0.0-alpha.19",
     "@nuxt/fonts": "^0.10.0",
     "@nuxtjs/tailwindcss": "^6.12.1",
     "@uploadthing/nuxt": "^7.0.2",
@@ -22,6 +23,7 @@
     "nuxt": "^3.13.0",
     "nuxt-workers": "^0.0.2",
     "onnxruntime-node": "^1.19.2",
+    "onnxruntime-web": "^1.19.2",
     "posthog-js": "^1.167.0",
     "sass-embedded": "^1.79.4",
     "uploadthing": "^7.0.2",
