@@ -1,11 +1,18 @@
-import { pipeline, env } from '@xenova/transformers'
+import { pipeline, env } from "@xenova/transformers"
+import * as ort from "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/esm/ort.webgpu.min.js";
+ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/";
+
+
 // Configure transformers environment
 env.allowLocalModels = false
 
 
 self.addEventListener('message', async (e) => {
     console.log("In worker (public): received data: "+ e)
-    const transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-small')
+    const transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-small', {
+      device: 'webgpu',
+      dtype: 'fp32', // or 'fp16'
+  })
     const plep = await transcriber(e.data, {
       // The length of audio chunks to process at a time (in seconds)
       // Shorter chunks use less memory but may reduce accuracy
