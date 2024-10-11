@@ -28,11 +28,11 @@ export default defineEventHandler(async (event) => {
 
 // Function to handle file deletion
 async function handleFileDeletion(filename: string, publicDir: string): Promise<object> {
-  const fileToDelete = join(publicDir, filename);
+  const fileToDelete = publicDir+'/'+filename;
 
   // Ensure only MP3 files can be deleted
-  if (!fileToDelete.endsWith('.mp3')) {
-    return { error: 'Invalid file type. Only MP3 files can be deleted.' };
+  if (!fileToDelete.endsWith('.wav') && !fileToDelete.endsWith('.mp3')) {
+    return { error: 'Invalid file type. Only wav files can be deleted.' };
   }
 
   try {
@@ -62,7 +62,7 @@ async function handleMp3Download(url: string, outputDir: string, config: any): P
     const downloadResult = await downloader.downloadSong(decodeURIComponent(url));
 
     // Return the path to the downloaded file, combining pathToDownloadFiles with the filename
-    const filename = downloadResult.toString().split('/').pop();
+    let filename = downloadResult.toString().split('/').pop();
 
     await new Promise(async (resolve, reject) => {
       ffmpeg(outputDir+'/'+filename)
@@ -78,11 +78,13 @@ async function handleMp3Download(url: string, outputDir: string, config: any): P
         .save(outputDir+'/'+filename.replace('mp3', 'wav'));
     });
 
-    let buffer = Buffer.from(await fetch(config.domain+'/'+filename.replace('mp3', 'wav')).then(x => x.arrayBuffer()))
+    await handleFileDeletion(filename.split('/').pop(), pathToStoreFiles)
+    filename = filename.replace('mp3', 'wav')
+    let buffer = Buffer.from(await fetch(config.domain+'/'+filename).then(x => x.arrayBuffer()))
 
    
 
-    return JSON.stringify({name: filename, buffer: buffer, url: '/'+filename.replace('mp3', 'wav')});
+    return JSON.stringify({name: filename, buffer: buffer, url: '/'+filename});
   } catch (err: any) {
     console.error('Error downloading MP3:', err);
 
