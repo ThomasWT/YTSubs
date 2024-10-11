@@ -1,5 +1,4 @@
 import { Downloader } from 'ytdl-mp3';
-import { join } from 'path';
 import fs from 'fs/promises';
 import ffmpeg from "fluent-ffmpeg";
 
