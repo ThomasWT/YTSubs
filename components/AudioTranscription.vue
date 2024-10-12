@@ -235,7 +235,7 @@ const estimatedProcessingTime = computed(() => {
 
 const formatArrayBuffer = async (url) => {
    // Fetch the audio data as an ArrayBuffer
-   const response = await fetch(url);
+   const response = await fetch(process.env.NODE_ENV == 'development' ? url : config.public.path_to_download_files+url);
       const arrayBuffer = await response.arrayBuffer();
 
       // Create a Uint8Array from the ArrayBuffer
