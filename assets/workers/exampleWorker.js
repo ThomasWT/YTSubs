@@ -1,8 +1,9 @@
- 
-import { pipeline, WhisperTextStreamer } from "@huggingface/transformers";
 
+import { pipeline, WhisperTextStreamer } from "@huggingface/transformers";
+import { pipeline as transl } from "@xenova/transformers";
 // Define model factories
 // Ensures only one model is created of each type
+var translator;
 class PipelineFactory {
     static task = null;
     static model = null;
@@ -15,6 +16,9 @@ class PipelineFactory {
 
     static async getInstance(progress_callback = null) {
         if (this.instance === null) {
+
+            // Load transcriber model
+            translator = await transl('translation', 'Xenova/mbart-large-50-many-to-many-mmt');
             this.instance = pipeline(this.task, this.model, {
                 dtype: {
                     encoder_model:
@@ -39,7 +43,11 @@ self.addEventListener("message", async (event) => {
     // TODO use message data
     let transcript = await transcribe(message);
     if (transcript === null) return;
-
+    let weouignowieg = await translator(`goodbye`, {
+    src_lang: 'en_XX', // Hindi
+    tgt_lang: 'sv_SE', // French
+})
+console.log(weouignowieg)
     // Send the result back to the main thread
     self.postMessage({
         status: "complete",
@@ -66,7 +74,6 @@ const transcribe = async (audiodata) => {
         }
     }
 
-    // Load transcriber model
     const transcriber = await p.getInstance((data) => {
         self.postMessage(data);
     });
@@ -106,9 +113,10 @@ const transcribe = async (audiodata) => {
                 tps = (num_tokens / (performance.now() - start_time)) * 1000;
             }
         },
-        callback_function: (x) => {
+        callback_function: async (x) => {
             if (chunks.length === 0) return;
             // Append text to the last chunk
+
             chunks.at(-1).text += x;
 
             self.postMessage({
@@ -120,12 +128,15 @@ const transcribe = async (audiodata) => {
                 },
             });
         },
-        on_chunk_end: (x) => {
+        on_chunk_end: async (x) => {
             const current = chunks.at(-1);
+
             current.timestamp[1] = x + current.offset;
             current.finalised = true;
         },
         on_finalize: () => {
+
+
             start_time = null;
             num_tokens = 0;
             ++chunk_count;

@@ -16,14 +16,28 @@
       </div>
       <div
         v-motion="{ initial: { opacity: 0, y: 30 }, enter: { opacity: 1, y: 0, transition: { duration: 1000, delay: 0 } } }"
-        class="mb-6 flex gap-2">
+        class="mb-6 flex gap-2 flex-col">
         <input v-model="transcription" type="text" placeholder="Enter YouTube URL"
           class="w-full px-4 py-1 rounded-md border border-gray-300 focus:outline-none bg-white placeholder-purple-400" />
-        <select
-          class="max-w-24 py-2 rounded-md border border-gray-300 focus:outline-none bg-white placeholder-purple-400"
-          v-model="selectedLanguage">
-          <option v-for="lang in languages">{{ lang }}</option>
-        </select>
+        <div class="flex gap-4 w-full">
+          <div class="w-full">
+            <p class="text-white">Language of video</p>
+            <select
+              class="w-full py-2 px-2 rounded-md border border-gray-300 focus:outline-none bg-white placeholder-purple-400"
+              v-model="selectedLanguage">
+              <option v-for="lang in languages">{{ lang }}</option>
+            </select>
+          </div>
+          <div class="w-full">
+            <p class="text-white">Translate subtitles to</p>
+            <select
+              class="w-full py-2 px-2 rounded-md border border-gray-300 focus:outline-none bg-white placeholder-purple-400"
+              v-model="selectedTargetLang">
+              <option v-for="lang in targetLang">{{ lang.name }}</option>
+            </select>
+          </div>
+        </div>
+
       </div>
       <div
         v-motion="{ initial: { opacity: 0, y: 20 }, enter: { opacity: 1, y: 0, transition: { duration: 1200, delay: 100 } } }"
@@ -212,8 +226,61 @@ const languages = [
   "yiddish",
   "yoruba"
 ]
-
-const pathToDownloadFiles = config.public.path_to_download_files
+const selectedTargetLang = ref();
+const targetLang = ref([
+  { iso: "ar_AR", name: "Arabic" },
+  { iso: "cs_CZ", name: "Czech" },
+  { iso: "de_DE", name: "German" },
+  { iso: "en_XX", name: "English" },
+  { iso: "es_XX", name: "Spanish" },
+  { iso: "et_EE", name: "Estonian" },
+  { iso: "fi_FI", name: "Finnish" },
+  { iso: "fr_XX", name: "French" },
+  { iso: "gu_IN", name: "Gujarati" },
+  { iso: "hi_IN", name: "Hindi" },
+  { iso: "it_IT", name: "Italian" },
+  { iso: "ja_XX", name: "Japanese" },
+  { iso: "kk_KZ", name: "Kazakh" },
+  { iso: "ko_KR", name: "Korean" },
+  { iso: "lt_LT", name: "Lithuanian" },
+  { iso: "lv_LV", name: "Latvian" },
+  { iso: "my_MM", name: "Burmese" },
+  { iso: "ne_NP", name: "Nepali" },
+  { iso: "nl_XX", name: "Dutch" },
+  { iso: "ro_RO", name: "Romanian" },
+  { iso: "ru_RU", name: "Russian" },
+  { iso: "si_LK", name: "Sinhala" },
+  { iso: "tr_TR", name: "Turkish" },
+  { iso: "vi_VN", name: "Vietnamese" },
+  { iso: "zh_CN", name: "Chinese" },
+  { iso: "af_ZA", name: "Afrikaans" },
+  { iso: "az_AZ", name: "Azerbaijani" },
+  { iso: "bn_IN", name: "Bengali" },
+  { iso: "fa_IR", name: "Persian" },
+  { iso: "he_IL", name: "Hebrew" },
+  { iso: "hr_HR", name: "Croatian" },
+  { iso: "id_ID", name: "Indonesian" },
+  { iso: "ka_GE", name: "Georgian" },
+  { iso: "km_KH", name: "Khmer" },
+  { iso: "mk_MK", name: "Macedonian" },
+  { iso: "ml_IN", name: "Malayalam" },
+  { iso: "mn_MN", name: "Mongolian" },
+  { iso: "mr_IN", name: "Marathi" },
+  { iso: "pl_PL", name: "Polish" },
+  { iso: "ps_AF", name: "Pashto" },
+  { iso: "pt_XX", name: "Portuguese" },
+  { iso: "sv_SE", name: "Swedish" },
+  { iso: "sw_KE", name: "Swahili" },
+  { iso: "ta_IN", name: "Tamil" },
+  { iso: "te_IN", name: "Telugu" },
+  { iso: "th_TH", name: "Thai" },
+  { iso: "tl_XX", name: "Tagalog" },
+  { iso: "uk_UA", name: "Ukrainian" },
+  { iso: "ur_PK", name: "Urdu" },
+  { iso: "xh_ZA", name: "Xhosa" },
+  { iso: "gl_ES", name: "Galician" },
+  { iso: "sl_SI", name: "Slovene" }
+])
 // Capture pageview
 posthog?.capture('$pageview', {
   current_url: route.fullPath
@@ -440,10 +507,10 @@ const processAudioFile = async (filepath: string) => {
 }
 
 const generateSRT = (chunks: any[]): string => {
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: 'smooth'
-    });
+  window.scrollTo({
+    top: document.documentElement.scrollHeight,
+    behavior: 'smooth'
+  });
 
   // Call scrollToBottom after generating SRT content
   return chunks.map((chunk, index) => {
