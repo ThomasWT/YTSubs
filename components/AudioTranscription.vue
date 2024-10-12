@@ -10,17 +10,19 @@
             v-motion="{ initial: { opacity: 0, y: 60 }, enter: { opacity: 1, y: 0, transition: { duration: 500, delay: 500 } } }"
             class="border border-purple-500 text-purple-500 shadow-sm text-xs font-medium me-2 px-2.5 py-0.5 rounded  tracking-normal">Free</span>
         </h1>
-
+        
         <p v-motion="{ initial: { opacity: 0, y: 30, scale: 0.9, filter: 'blur(10px)' }, enter: { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', transition: { duration: 1000, delay: 100 } } }"
           class="text-purple-600 tracking-wider font-bold">Transcribe a video with your browser</p>
       </div>
       <div
         v-motion="{ initial: { opacity: 0, y: 30 }, enter: { opacity: 1, y: 0, transition: { duration: 1000, delay: 0 } } }"
-        class="mb-6">
+        class="mb-6 flex gap-2">
         <input v-model="transcription" type="text" placeholder="Enter YouTube URL"
-          class="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none bg-white placeholder-purple-400" />
+          class="w-full px-4 py-1 rounded-md border border-gray-300 focus:outline-none bg-white placeholder-purple-400" />
+          <select class="max-w-24 py-2 rounded-md border border-gray-300 focus:outline-none bg-white placeholder-purple-400" v-model="selectedLanguage">
+            <option v-for="lang in languages">{{ lang }}</option>
+          </select>
       </div>
-
       <div
         v-motion="{ initial: { opacity: 0, y: 20 }, enter: { opacity: 1, y: 0, transition: { duration: 1200, delay: 100 } } }"
         class="mb-6">
@@ -76,11 +78,8 @@
 </template>
 
 <script setup lang="ts">
-import { pipeline, env } from '@xenova/transformers'
-import transcriberWorker from '../assets/workers/transcriber?worker'
+import transcriberWorker from '../assets/workers/exampleWorker?worker'
 import { WaveFile } from 'wavefile';
-// Configure transformers environment
-env.allowLocalModels = false
 // State
 const transcription = ref('')
 const resultTranscript = ref('')
@@ -91,12 +90,113 @@ const filename = ref('')
 const duration = ref(0)
 const elapsedTime = ref(0)
 const processingStartTime = ref(0)
-
 // Composables
 const { $posthog } = useNuxtApp()
 const posthog = $posthog()
 const route = useRoute()
 const config = useRuntimeConfig()
+const selectedLanguage = ref('english')
+const languages = [
+  "afrikaans",
+  "albanian",
+  "amharic",
+  "arabic",
+  "armenian",
+  "assamese",
+  "azerbaijani",
+  "bashkir",
+  "basque",
+  "belarusian",
+  "bengali",
+  "bosnian",
+  "breton",
+  "bulgarian",
+  "catalan/valencian",
+  "chinese",
+  "croatian",
+  "czech",
+  "danish",
+  "dutch/flemish",
+  "english",
+  "estonian",
+  "faroese",
+  "finnish",
+  "french",
+  "galician",
+  "georgian",
+  "german",
+  "greek",
+  "gujarati",
+  "haitian creole/haitian",
+  "hausa",
+  "hawaiian",
+  "hebrew",
+  "hindi",
+  "hungarian",
+  "icelandic",
+  "indonesian",
+  "italian",
+  "japanese",
+  "javanese",
+  "kannada",
+  "kazakh",
+  "khmer",
+  "korean",
+  "lao",
+  "latin",
+  "latvian",
+  "lingala",
+  "lithuanian",
+  "luxembourgish/letzeburgesch",
+  "macedonian",
+  "malagasy",
+  "malay",
+  "malayalam",
+  "maltese",
+  "maori",
+  "marathi",
+  "mongolian",
+  "myanmar/burmese",
+  "nepali",
+  "norwegian",
+  "nynorsk",
+  "occitan",
+  "pashto/pushto",
+  "persian",
+  "polish",
+  "portuguese",
+  "punjabi/panjabi",
+  "romanian/moldavian/moldovan",
+  "russian",
+  "sanskrit",
+  "serbian",
+  "shona",
+  "sindhi",
+  "sinhala/sinhalese",
+  "slovak",
+  "slovenian",
+  "somali",
+  "spanish/castilian",
+  "sundanese",
+  "swahili",
+  "swedish",
+  "tagalog",
+  "tajik",
+  "tamil",
+  "tatar",
+  "telugu",
+  "thai",
+  "tibetan",
+  "turkish",
+  "turkmen",
+  "ukrainian",
+  "urdu",
+  "uzbek",
+  "vietnamese",
+  "welsh",
+  "yiddish",
+  "yoruba"
+]
 
 const pathToDownloadFiles = config.public.path_to_download_files
 // Capture pageview
@@ -108,8 +208,8 @@ posthog?.capture('$pageview', {
 const estimatedProcessingTime = computed(() => {
   if (duration.value > 0) {
     // Data points
-    const durations = [7, 77, 240]; // in seconds
-    const processingTimes = [30, 58, 237]; // in seconds
+    const durations = [136, 20, 76]; // in seconds
+    const processingTimes = [50, 30, 42]; // in seconds
 
     // Calculate slope and intercept for linear regression
     const n = durations.length;
@@ -169,11 +269,20 @@ const testWorkerProcessing = async (filepath) => {
 
     const audioData = await formatArrayBuffer(filepath)
 
-      worker.postMessage(audioData)
+      worker.postMessage({audio: audioData, language: selectedLanguage.value})
+
+      
+      
       worker.addEventListener('message', (e) => {
         if (e) {
-          resolve(e.data)
-          worker.terminate()
+          if(e.data.status == 'update') {
+            srtContent.value = generateSRT(e.data.data.chunks)
+          } else {
+            if(e.data.status == 'complete') {
+            resolve(e.data)
+            worker.terminate()
+            }
+          }
         }
       }, false)
 
@@ -192,23 +301,11 @@ const getAudioData = async (url) => {
 
 }
 
+
+
 const transcribeAudio = async (filepath: string): Promise<any> => {
   try {
     return await testWorkerProcessing(filepath)
-    /*     const transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-small')
-        return await transcriber(filepath, {
-          // The length of audio chunks to process at a time (in seconds)
-          // Shorter chunks use less memory but may reduce accuracy
-          chunk_length_s: 120,
-    
-          // The stride between chunks (in seconds)
-          // Smaller stride increases overlap, potentially improving accuracy at the cost of processing time
-          stride_length_s: 20,
-    
-          // Whether to return timestamps for each transcribed segment
-          // Useful for generating subtitles or aligning text with audio
-          return_timestamps: true,
-        }) */
   } catch (err) {
     console.error('Transcription error:', err)
     return null
@@ -296,7 +393,7 @@ const downloadAudio = async (url: string): Promise<string> => {
 // Function to process the downloaded audio file
 const processAudioFile = async (filepath: string) => {
   // Create a new Audio object with the given file path
-  const audio = new Audio(process.env.NODE_ENV == 'development' ? '' : config.public.path_to_download_files+filepath.url)
+  const audio = new Audio(process.env.NODE_ENV == 'development' ? filepath.url : config.public.path_to_download_files+filepath.url)
 
   // Add an event listener for when the audio metadata is loaded
   audio.addEventListener('loadedmetadata', async () => {
@@ -315,9 +412,6 @@ const processAudioFile = async (filepath: string) => {
     const result = await transcribeAudio(filepath.url)
 
     if (result) {
-      // If transcription is successful, update the result and SRT content
-      resultTranscript.value = result.text
-      srtContent.value = generateSRT(result.chunks)
       loading.value = false
       // Delete the temporary audio file after processing
       await deleteExistingFile()
