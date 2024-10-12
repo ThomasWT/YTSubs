@@ -10,7 +10,7 @@
             v-motion="{ initial: { opacity: 0, y: 60 }, enter: { opacity: 1, y: 0, transition: { duration: 500, delay: 500 } } }"
             class="border border-purple-500 text-purple-500 shadow-sm text-xs font-medium me-2 px-2.5 py-0.5 rounded  tracking-normal">Free</span>
         </h1>
-        
+
         <p v-motion="{ initial: { opacity: 0, y: 30, scale: 0.9, filter: 'blur(10px)' }, enter: { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', transition: { duration: 1000, delay: 100 } } }"
           class="text-purple-600 tracking-wider font-bold">Transcribe a video with your browser</p>
       </div>
@@ -19,9 +19,11 @@
         class="mb-6 flex gap-2">
         <input v-model="transcription" type="text" placeholder="Enter YouTube URL"
           class="w-full px-4 py-1 rounded-md border border-gray-300 focus:outline-none bg-white placeholder-purple-400" />
-          <select class="max-w-24 py-2 rounded-md border border-gray-300 focus:outline-none bg-white placeholder-purple-400" v-model="selectedLanguage">
-            <option v-for="lang in languages">{{ lang }}</option>
-          </select>
+        <select
+          class="max-w-24 py-2 rounded-md border border-gray-300 focus:outline-none bg-white placeholder-purple-400"
+          v-model="selectedLanguage">
+          <option v-for="lang in languages">{{ lang }}</option>
+        </select>
       </div>
       <div
         v-motion="{ initial: { opacity: 0, y: 20 }, enter: { opacity: 1, y: 0, transition: { duration: 1200, delay: 100 } } }"
@@ -72,6 +74,19 @@
         </div>
 
         <pre class="bg-gray-100 p-4 rounded-md text-sm text-gray-800 overflow-x-auto shadow-md">{{ srtContent }}</pre>
+
+        <div v-if="srtContent" class="mb-6 gap-2 flex flex-col">
+          <div class="flex justify-end">
+            <button :disabled="loading" class="text-white rounded-md flex items-center" @click="downloadSRT">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Download
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -234,32 +249,32 @@ const estimatedProcessingTime = computed(() => {
 });
 
 const formatArrayBuffer = async (url) => {
-   // Fetch the audio data as an ArrayBuffer
-   const response = await fetch(process.env.NODE_ENV == 'development' ? url : config.public.path_to_download_files+url);
-      const arrayBuffer = await response.arrayBuffer();
+  // Fetch the audio data as an ArrayBuffer
+  const response = await fetch(process.env.NODE_ENV == 'development' ? url : config.public.path_to_download_files + url);
+  const arrayBuffer = await response.arrayBuffer();
 
-      // Create a Uint8Array from the ArrayBuffer
-      let audioData = new Uint8Array(arrayBuffer);
+  // Create a Uint8Array from the ArrayBuffer
+  let audioData = new Uint8Array(arrayBuffer);
 
-      // Read .wav file and convert it to required format
-      let wav = new WaveFile(audioData);
-      wav.toBitDepth('32f'); // Pipeline expects input as a Float32Array
-      wav.toSampleRate(16000); // Whisper expects audio with a sampling rate of 16000
-      audioData = wav.getSamples();
+  // Read .wav file and convert it to required format
+  let wav = new WaveFile(audioData);
+  wav.toBitDepth('32f'); // Pipeline expects input as a Float32Array
+  wav.toSampleRate(16000); // Whisper expects audio with a sampling rate of 16000
+  audioData = wav.getSamples();
 
-      if (Array.isArray(audioData)) {
-        if (audioData.length > 1) {
-          const SCALING_FACTOR = Math.sqrt(2);
+  if (Array.isArray(audioData)) {
+    if (audioData.length > 1) {
+      const SCALING_FACTOR = Math.sqrt(2);
 
-          // Merge channels (into first channel to save memory)
-          for (let i = 0; i < audioData[0].length; ++i) {
-            audioData[0][i] = SCALING_FACTOR * (audioData[0][i] + audioData[1][i]) / 2;
-          }
-        }
-
-        // Select first channel
-        return audioData = audioData[0];
+      // Merge channels (into first channel to save memory)
+      for (let i = 0; i < audioData[0].length; ++i) {
+        audioData[0][i] = SCALING_FACTOR * (audioData[0][i] + audioData[1][i]) / 2;
       }
+    }
+
+    // Select first channel
+    return audioData = audioData[0];
+  }
 }
 
 const testWorkerProcessing = async (filepath) => {
@@ -267,20 +282,20 @@ const testWorkerProcessing = async (filepath) => {
     return new Promise(async (resolve, reject) => {
       const worker = new transcriberWorker()
 
-    const audioData = await formatArrayBuffer(filepath)
+      const audioData = await formatArrayBuffer(filepath)
 
-      worker.postMessage({audio: audioData, language: selectedLanguage.value})
+      worker.postMessage({ audio: audioData, language: selectedLanguage.value })
 
-      
-      
+
+
       worker.addEventListener('message', (e) => {
         if (e) {
-          if(e.data.status == 'update') {
+          if (e.data.status == 'update') {
             srtContent.value = generateSRT(e.data.data.chunks)
           } else {
-            if(e.data.status == 'complete') {
-            resolve(e.data)
-            worker.terminate()
+            if (e.data.status == 'complete') {
+              resolve(e.data)
+              worker.terminate()
             }
           }
         }
@@ -314,6 +329,7 @@ const transcribeAudio = async (filepath: string): Promise<any> => {
 
 const downloadSRT = () => {
   if (srtContent.value) {
+    posthog?.capture('Download SRT')
     const blob = new Blob([srtContent.value], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -393,7 +409,7 @@ const downloadAudio = async (url: string): Promise<string> => {
 // Function to process the downloaded audio file
 const processAudioFile = async (filepath: string) => {
   // Create a new Audio object with the given file path
-  const audio = new Audio(process.env.NODE_ENV == 'development' ? filepath.url : config.public.path_to_download_files+filepath.url)
+  const audio = new Audio(process.env.NODE_ENV == 'development' ? filepath.url : config.public.path_to_download_files + filepath.url)
 
   // Add an event listener for when the audio metadata is loaded
   audio.addEventListener('loadedmetadata', async () => {
@@ -424,6 +440,12 @@ const processAudioFile = async (filepath: string) => {
 }
 
 const generateSRT = (chunks: any[]): string => {
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: 'smooth'
+    });
+
+  // Call scrollToBottom after generating SRT content
   return chunks.map((chunk, index) => {
     const startTime = formatSRTTime(chunk.timestamp[0])
     const endTime = formatSRTTime(chunk.timestamp[1])
