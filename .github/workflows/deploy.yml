@@ -21,13 +21,19 @@ jobs:
 
     - name: Install packages
       run: pnpm install
-
+    - name: Create .env file
+      run: |
+        echo "DOMAIN=${{ secrets.DOMAIN }}" > .env
+        echo "PATH_TO_STORE_TEMP_FILES=${{ secrets.PATH_TO_STORE_TEMP_FILES }}" >> .env
+        echo "PATH_TO_DOWNLOAD_FILES=${{ secrets.PATH_TO_DOWNLOAD_FILES }}" >> .env
+        echo "POSTHOG_PUBLIC_KEY=${{ secrets.POSTHOG_PUBLIC_KEY }}" >> .env
+        echo "POSTHOG_HOST=${{ secrets.POSTHOG_HOST }}" >> .env
+        
     - name: Build
       run: pnpm run build
 
-    - name: Copy ffmpeg-static
-      run: cp -r ./node_modules/ffmpeg-static/ .output/server/node_modules
-      run: cp -r ./node_modules/fluent-ffmpeg/ .output/server/node_modules
+    - name: Copy binaries
+      run: cp -r ./node_modules/ffmpeg-static/ .output/server/node_modules && cp -r ./node_modules/fluent-ffmpeg/ .output/server/node_modules
 
     - name: Deploy to server
       uses: appleboy/scp-action@master
