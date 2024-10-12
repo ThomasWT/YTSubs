@@ -10,8 +10,7 @@
             v-motion="{ initial: { opacity: 0, y: 60 }, enter: { opacity: 1, y: 0, transition: { duration: 500, delay: 500 } } }"
             class="border border-purple-500 text-purple-500 shadow-sm text-xs font-medium me-2 px-2.5 py-0.5 rounded  tracking-normal">Free</span>
         </h1>
-
-        <p>https://www.youtube.com/watch?v=mA93Rhj6Tm8</p>
+        
         <p v-motion="{ initial: { opacity: 0, y: 30, scale: 0.9, filter: 'blur(10px)' }, enter: { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', transition: { duration: 1000, delay: 100 } } }"
           class="text-purple-600 tracking-wider font-bold">Transcribe a video with your browser</p>
       </div>
