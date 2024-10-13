@@ -77,7 +77,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 - [Whisper](https://github.com/openai/whisper) - The AI model powering our transcription
 - [Transformers.js](https://github.com/xenova/transformers.js) - For running Whisper models in the browser
-- [ytdl-mp3](https://github.com/ytdl-mp3/ytdl-mp3) - For YouTube audio extraction
+- [ytdl-mp3](https://github.com/joshunrau/ytdl-mp3). - For YouTube audio extraction
 
 ## Contact
 
