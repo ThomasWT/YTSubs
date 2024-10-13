@@ -81,7 +81,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Contact
 
-Your Name - [@eothica](https://twitter.com/eothica)
+Twitter - [@eothica](https://twitter.com/eothica)
 
 Project Link: [https://github.com/ThomasWT/caption-youtube](https://github.com/ThomasWT/caption-youtube)
 
