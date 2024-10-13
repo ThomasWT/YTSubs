@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@huggingface/transformers':
-        specifier: ^3.0.0-alpha.19
+        specifier: ^3.0.0-alpha.20
         version: 3.0.0-alpha.20
       '@nuxt/fonts':
         specifier: ^0.10.0

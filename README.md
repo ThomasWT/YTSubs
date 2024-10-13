@@ -1,75 +1,91 @@
-# Nuxt 3 Minimal Starter
+# YTSubs: AI-Powered YouTube Subtitle Extractor
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+### Disclaimer
+This is just a small sideproject. It does not include any best practice and is more a proof of concept than something really useful. If you can make it or fork it into something useful, feel free to do so
 
-## Setup
+YTSubs is a web application that allows users to extract subtitles from YouTube videos using Client side loaded models from [transformers.js](https://github.com/xenova/transformers.js/tree/v3)
 
-Make sure to install the dependencies:
+## Features
+- Experimental running on WebGPU from [transformers v3](https://github.com/xenova/transformers.js/tree/v3)
+- Extract subtitles from YouTube videos using o
+- Process videos up to 20 minutes long
+- Transcribes multiple languages
+- Streaming transcription progress updates
+- Download subtitles in SRT format
+- Fully client-side processing
 
-```bash
-# npm
-npm install
+## Tech Stack
 
-# pnpm
-pnpm install
+- [Nuxt.js 3](https://nuxt.com/) - Vue.js framework
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+- [Hugging Face Transformers](https://huggingface.co/transformers/) - State-of-the-art Natural Language Processing
+- [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) - For background processing
+- [PostHog](https://posthog.com/) - Open-source product analytics
 
-# yarn
-yarn install
+## Getting Started
 
-# bun
-bun install
-```
+### Prerequisites
 
-## Development Server
+- Node.js (v14 or later)
+- pnpm
 
-Start the development server on `http://localhost:3000`:
+### Installation
 
-```bash
-# npm
-npm run dev
+1. Clone the repository:
+   ```
+   git clone https://github.com/yourusername/ytsubs.git
+   cd ytsubs
+   ```
 
-# pnpm
-pnpm run dev
+2. Install dependencies:
+   ```
+   pnpm install
+   ```
 
-# yarn
-yarn dev
+3. Create a `.env` file in the root directory and add the following variables:
+   ```
+   # Hosted domain
+   DOMAIN=your_domain
 
-# bun
-bun run dev
-```
+   # Path to store mp3 files that needs to be converted to .wav
+   PATH_TO_STORE_TEMP_FILES=path_to_temp_files
 
-## Production
+   # Public download path
+   PATH_TO_DOWNLOAD_FILES=path_to_download_files
+   ```
 
-Build the application for production:
+4. Run the development server:
+   ```
+   pnpm run dev
+   ```
 
-```bash
-# npm
-npm run build
+5. Open `http://localhost:3000` in your browser to see the application.
 
-# pnpm
-pnpm run build
+## Usage
 
-# yarn
-yarn build
+1. Enter a YouTube URL in the input field.
+2. Select the language of the video.
+3. Click "Transcribe" to start the process.
+4. Wait for the transcription to complete.
+5. Download the SRT file with the extracted subtitles.
 
-# bun
-bun run build
-```
+## Contributing
 
-Locally preview production build:
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-```bash
-# npm
-npm run preview
+## License
 
-# pnpm
-pnpm run preview
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-# yarn
-yarn preview
+## Acknowledgments
 
-# bun
-bun run preview
-```
+- [Whisper](https://github.com/openai/whisper) - The AI model powering our transcription
+- [Transformers.js](https://github.com/xenova/transformers.js) - For running Whisper models in the browser
+- [ytdl-mp3](https://github.com/ytdl-mp3/ytdl-mp3) - For YouTube audio extraction
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+## Contact
+
+Your Name - [@eothica](https://twitter.com/eothica)
+
+Project Link: [https://github.com/ThomasWT/caption-youtube](https://github.com/ThomasWT/caption-youtube)
+
