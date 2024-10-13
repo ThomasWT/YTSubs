@@ -73,10 +73,6 @@ YTSubs is a web application that allows users to extract subtitles from YouTube 
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## Acknowledgments
 
 - [Whisper](https://github.com/openai/whisper) - The AI model powering our transcription
