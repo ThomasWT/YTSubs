@@ -1,4 +1,4 @@
-# YTSubs: AI-Powered YouTube Subtitle Extractor
+# YTSubs: AI-Powered YouTube Subtitle generator
 
 ### Disclaimer
 This is just a small sideproject. It does not include any best practice and is more a proof of concept than something really useful. If you can make it or fork it into something useful, feel free to do so
@@ -7,7 +7,7 @@ YTSubs is a web application that allows users to extract subtitles from YouTube 
 
 ## Features
 - Experimental running on WebGPU from [transformers v3](https://github.com/xenova/transformers.js/tree/v3)
-- Extract subtitles from YouTube videos using o
+- generate subtitles from YouTube videos using client side ai
 - Process videos up to 20 minutes long
 - Transcribes multiple languages
 - Streaming transcription progress updates
