@@ -360,7 +360,6 @@ const downloadSRT = () => {
 
 const handleFileUpload = async () => {
   // Set loading state and reset error
-  loading.value = true
   error.value = ''
   duration.value = 0
   // Initialize processing time tracking
@@ -385,6 +384,7 @@ const handleFileUpload = async () => {
   }
 
   try {
+    loading.value = true
     // Track transcription event in PostHog
     posthog?.capture('Transcribing', { property: transcription.value })
 
