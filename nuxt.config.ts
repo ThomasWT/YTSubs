@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
-  modules: ['nuxt-workers', '@nuxtjs/tailwindcss', '@vueuse/motion/nuxt', '@nuxt/fonts'],
+  modules: ['@nuxtjs/tailwindcss', '@vueuse/motion/nuxt', '@nuxt/fonts'],
   runtimeConfig: {
     domain: process.env.DOMAIN,
     path_to_store_temp_files: process.env.PATH_TO_STORE_TEMP_FILES,
