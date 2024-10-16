@@ -121,7 +121,7 @@ async function handleMp3Download(url: string, outputDir: string, config: any): P
     } else {
       throw createError({
         statusCode: 500,
-        statusMessage: err.message
+        statusMessage: err.statusMessage
       })
     }
 
