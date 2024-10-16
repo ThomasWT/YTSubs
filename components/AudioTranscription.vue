@@ -12,7 +12,7 @@
         </h1>
 
         <p v-motion="{ initial: { opacity: 0, y: 30, scale: 0.9, filter: 'blur(10px)' }, enter: { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', transition: { duration: 1000, delay: 100 } } }"
-          class="text-purple-600 tracking-wider font-bold">Transcribe a video with your browser</p>
+          class="text-purple-800 tracking-wider font-bold">Transcribe a video with your browser</p>
       </div>
       <div
         v-motion="{ initial: { opacity: 0, y: 30 }, enter: { opacity: 1, y: 0, transition: { duration: 1000, delay: 0 } } }"
