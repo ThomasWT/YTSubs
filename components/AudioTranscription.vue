@@ -385,7 +385,7 @@ const handleFileUpload = async () => {
     await processAudioFile(filestuff)
   } catch (err: any) {
     // Handle any errors that occur during the process
-    error.value = `File upload error: ${err.statusMessage || 'Unknown error'}`
+    error.value = `${err.statusMessage || err}`
     loading.value = false
   }
 }
