@@ -75,7 +75,10 @@ async function handleMp3Download(url: string, outputDir: string, config: any): P
 
     // Check if video duration exceeds 20 minutes (1200 seconds)
     if (videoDuration > 1200) {
-      throw new Error('Video duration exceeds 20 minutes limit');
+      throw createError({
+        statusCode: 422,
+        statusMessage: 'Video duration exceeds 20 minutes limit'
+      });
     }
 
     console.log(`Video Title: ${videoTitle}`);
