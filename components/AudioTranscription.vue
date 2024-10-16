@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex items-center justify-center p-4 font-[Inter]">
     <div v-motion="{ initial: { opacity: 0, y: 30, }, enter: { opacity: 1, y: 0, transition: { duration: 1000 } } }"
-      class="cardcontainer backdrop-blur-md bg-purple-300/30 rounded-lg shadow-2xl p-8 max-w-2xl w-full border-2 border-purple-400/30">
+      class="cardcontainer backdrop-blur-md bg-purple-300/50 rounded-lg shadow-2xl p-8 max-w-2xl w-full border-2 border-purple-400/30">
       <div class="flex flex-col justify-center  items-center  mb-8">
         <h1
           v-motion="{ initial: { opacity: 0, y: 30, scale: 0.9, filter: 'blur(10px)' }, enter: { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', transition: { duration: 1000 } } }"
