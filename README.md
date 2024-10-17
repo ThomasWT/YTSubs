@@ -8,7 +8,7 @@ YTSubs is a web application that allows users to generate subtitles from YouTube
 
 ## Features
 - Experimental running on WebGPU from [transformers v3](https://github.com/xenova/transformers.js/tree/v3)
-- generate subtitles from YouTube videos using client side ai
+- Generate subtitles from YouTube videos using client side ai
 - Process videos up to 20 minutes long
 - Transcribes multiple languages
 - Streaming transcription progress updates
@@ -34,7 +34,7 @@ YTSubs is a web application that allows users to generate subtitles from YouTube
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/ytsubs.git
+   git clone https://github.com/ThomasWT/YTSubs.git
    cd ytsubs
    ```
 
