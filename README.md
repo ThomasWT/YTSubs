@@ -4,7 +4,7 @@
 ### Disclaimer
 This is just a small sideproject. It does not include any best practice and is more a proof of concept than something really useful. If you can make it or fork it into something useful, feel free to do so
 
-YTSubs is a web application that allows users to extract subtitles from YouTube videos using Client side loaded models from [transformers.js](https://github.com/xenova/transformers.js/tree/v3)
+YTSubs is a web application that allows users to generate subtitles from YouTube videos using Client side loaded models from [transformers.js](https://github.com/xenova/transformers.js/tree/v3)
 
 ## Features
 - Experimental running on WebGPU from [transformers v3](https://github.com/xenova/transformers.js/tree/v3)
