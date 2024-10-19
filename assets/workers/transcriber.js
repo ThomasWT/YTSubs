@@ -8,7 +8,7 @@ env.allowLocalModels = false
 
 self.addEventListener('message', async (e) => {
 
-  const transcriber = await pipeline('automatic-speech-recognition', 'onnx-community/whisper-large-v3-turbo', {
+  const transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-small', {
     cacheDir: './',
     device: 'webgpu',
     dtype: {
