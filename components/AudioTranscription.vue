@@ -17,10 +17,10 @@
       <div
         v-motion="{ initial: { opacity: 0, y: 30 }, enter: { opacity: 1, y: 0, transition: { duration: 1000, delay: 0 } } }"
         class="mb-6 flex gap-2">
-        <input v-model="transcription" type="text" placeholder="Enter YouTube URL"
-          class="w-full px-4 py-1 rounded-md border border-gray-300 focus:outline-none bg-white placeholder-purple-400" />
-        <select
-          class="max-w-24 py-2 rounded-md border border-gray-300 focus:outline-none bg-white placeholder-purple-400"
+        <input :disabled="!modelLoaded" v-model="transcription" type="text" placeholder="Enter YouTube URL"
+          class="w-full px-4 disabled:opacity-40 py-1 rounded-md border border-gray-300 focus:outline-none bg-white placeholder-purple-400" />
+        <select :disabled="!modelLoaded"
+          class="max-w-24 py-2 rounded-md border border-gray-300 focus:outline-none bg-white placeholder-purple-400 disabled:opacity-40"
           v-model="selectedLanguage">
           <option v-for="lang in languages">{{ lang }}</option>
         </select>
@@ -46,7 +46,7 @@
                   <p class="ml-3 text-white">Downloading Model..</p>
                 </div>
               </span>
-              <span v-else>Load whisper-large-v3-turbo 1.8GB</span>
+              <span v-else>Load Model (1.2GB)</span>
             </Transition>
           </div>
         </button>
@@ -132,7 +132,6 @@
 
 <script setup lang="ts">
 import transcriberWorker from '../assets/workers/exampleWorker?worker'
-const worker = new transcriberWorker()
 import { WaveFile } from 'wavefile';
 // State
 const transcription = ref('')
@@ -146,6 +145,7 @@ const elapsedTime = ref(0)
 const processingStartTime = ref(0)
 const modelLoaded = ref(false);
 const downloadingModel = ref(false)
+const worker = new transcriberWorker()
 
 // Composables
 const { $posthog } = useNuxtApp()
@@ -265,8 +265,8 @@ posthog?.capture('$pageview', {
 const estimatedProcessingTime = computed(() => {
   if (duration.value > 0) {
     // Data points
-    const durations = [633, 76]; // in seconds
-    const processingTimes = [134, 12]; // in seconds
+    const durations = [633, 76, 136]; // in seconds
+    const processingTimes = [134, 12, 20]; // in seconds
 
     // Calculate slope and intercept for linear regression
     const n = durations.length;
@@ -325,9 +325,6 @@ const testWorkerProcessing = async (filepath) => {
       const audioData = await formatArrayBuffer(filepath)
 
       worker.postMessage({ audio: audioData, language: selectedLanguage.value, status: 'transcribeVideo' })
-
-
-
       worker.addEventListener('message', (e) => {
         if (e) {
           if (e.data.status == 'update') {
@@ -352,19 +349,21 @@ const testWorkerProcessing = async (filepath) => {
   }
 }
 
+
+      worker.addEventListener('message', (e) => {
+        if (e) {
+          if(e.data.status == 'modelLoaded') {
+            console.log('model Loaded')
+            modelLoaded.value = true;
+            downloadingModel.value = false;
+          }
+        }
+      }, false)
+
 const loadModel = async () => {
   worker.postMessage('loadModel')
   downloadingModel.value = true;
 }
-
-
-worker.addEventListener('message', (e) => {
-  if(e.data.status == 'modelLoaded') {
-    console.log('model Loaded')
-    modelLoaded.value = true;
-    downloadingModel.value = false;
-  }
-})
 
 const transcribeAudio = async (filepath: string): Promise<any> => {
   try {
