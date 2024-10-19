@@ -46,11 +46,11 @@
                   <p class="ml-3 text-white">Downloading Model..</p>
                 </div>
               </span>
-              <span v-else>Load Model (1.2GB)</span>
+              <span v-else>Load Model (650MB)</span>
             </Transition>
           </div>
         </button>
-        <button v-else @click="handleFileUpload"
+        <button v-else @click="handleTranscriptionRequest"
           class="w-full bg-purple-900/50 backdrop-blur-md text-white py-2 px-4 rounded-md hover:bg-purple-900/40 transition duration-300 border border-white/30 shadow-lg"
           :disabled="loading">
           <div class="w-full flex justify-center items-center h-6 overflow-hidden">
@@ -77,7 +77,7 @@
           </div>
         </button>
         <div v-if="downloadingModel" class="w-full bg-purple-200 rounded-full h-2.5 mt-2">
-          <div class="bg-purple-400 h-2.5 rounded-full" :style="{width: downloadModelProgress+'%'}"></div>
+          <div class="bg-purple-400 h-2.5 rounded-full transition-all" :style="{width: downloadModelProgress+'%'}"></div>
         </div>
       </div>
 
@@ -136,17 +136,15 @@
 <script setup lang="ts">
 import transcriberWorker from '../assets/workers/exampleWorker?worker'
 import { WaveFile } from 'wavefile';
+
 // State
 const transcription = ref('')
-const resultTranscript = ref('')
 const srtContent = ref('')
 const loading = ref(false)
 const error = ref('')
 const filename = ref('')
 const duration = ref(0)
-const elapsedTime = ref(0)
-const processingStartTime = ref(0)
-const modelLoaded = ref(false);
+const modelLoaded = ref(false)
 const downloadingModel = ref(false)
 const downloadModelProgress = ref(0)
 const worker = new transcriberWorker()
@@ -294,50 +292,38 @@ const estimatedProcessingTime = computed(() => {
   return '';
 });
 
-const formatArrayBuffer = async (url) => {
-  // Fetch the audio data as an ArrayBuffer
+const formatAudioData = async (url) => {
   const response = await fetch(process.env.NODE_ENV == 'development' ? url : config.public.path_to_download_files + url);
   const arrayBuffer = await response.arrayBuffer();
-
-  // Create a Uint8Array from the ArrayBuffer
   let audioData = new Uint8Array(arrayBuffer);
 
-  // Read .wav file and convert it to required format
   let wav = new WaveFile(audioData);
-  wav.toBitDepth('32f'); // Pipeline expects input as a Float32Array
-  wav.toSampleRate(16000); // Whisper expects audio with a sampling rate of 16000
+  wav.toBitDepth('32f');
+  wav.toSampleRate(16000);
   audioData = wav.getSamples();
 
   if (Array.isArray(audioData)) {
     if (audioData.length > 1) {
       const SCALING_FACTOR = Math.sqrt(2);
-
-      // Merge channels (into first channel to save memory)
       for (let i = 0; i < audioData[0].length; ++i) {
         audioData[0][i] = SCALING_FACTOR * (audioData[0][i] + audioData[1][i]) / 2;
       }
     }
-
-    // Select first channel
-    return audioData = audioData[0];
+    return audioData[0];
   }
 }
 
-const testWorkerProcessing = async (filepath) => {
+const processAudioWithWorker = async (filepath) => {
   try {
     return new Promise(async (resolve, reject) => {
-      const audioData = await formatArrayBuffer(filepath)
+      const audioData = await formatAudioData(filepath)
 
       worker.postMessage({ audio: audioData, language: selectedLanguage.value, status: 'transcribeVideo' })
       worker.addEventListener('message', (e) => {
-        if (e) {
-          if (e.data.status == 'update') {
-            srtContent.value = generateSRT(e.data.data.chunks)
-          } else {
-            if (e.data.status == 'complete') {
-              resolve(e.data)
-            }
-          }
+        if (e.data.status == 'update') {
+          srtContent.value = generateSRT(e.data.data.chunks)
+        } else if (e.data.status == 'complete') {
+          resolve(e.data)
         }
       }, false)
 
@@ -346,24 +332,19 @@ const testWorkerProcessing = async (filepath) => {
       })
     })
   } catch (error) {
-    console.error('Error in testWorkerProcessing:', error)
+    console.error('Error in processAudioWithWorker:', error)
     throw error
   }
 }
 
-
 worker.addEventListener('message', (e) => {
-  if (e) {
-    if(e.data.status == 'modelLoaded') {
-      console.log('model Loaded')
-      modelLoaded.value = true;
-      downloadingModel.value = false;
-    }
-    if(e.data.status == 'downloadProgress') {
-      if(e.data?.progress?.progress && e.data?.progress?.file == 'onnx/encoder_model_fp16.onnx') {
-        downloadModelProgress.value = e.data?.progress?.progress
-      }
-    }
+  if (e.data.status == 'modelLoaded') {
+    console.log('model Loaded')
+    modelLoaded.value = true;
+    downloadingModel.value = false;
+  }
+  if (e.data.status == 'downloadProgress' && e.data?.progress?.file == 'onnx/encoder_model_q4f16.onnx') {
+    downloadModelProgress.value = e.data?.progress?.progress
   }
 }, false)
 
@@ -374,7 +355,7 @@ const loadModel = async () => {
 
 const transcribeAudio = async (filepath: string): Promise<any> => {
   try {
-    return await testWorkerProcessing(filepath)
+    return await processAudioWithWorker(filepath)
   } catch (err) {
     console.error('Transcription error:', err)
     return null
@@ -396,25 +377,17 @@ const downloadSRT = () => {
   }
 }
 
-const handleFileUpload = async () => {
-  // Set loading state and reset error
+const handleTranscriptionRequest = async () => {
   error.value = ''
   duration.value = 0
-  // Initialize processing time tracking
-  processingStartTime.value = Date.now()
-  elapsedTime.value = 0
-
-  // Delete any existing file before processing
   await deleteExistingFile()
 
-  // Validate input: check if URL is provided
   if (!transcription.value) {
     error.value = 'Please enter a YouTube URL'
     loading.value = false
     return
   }
 
-  // Validate input: check if URL is a valid YouTube URL
   if (!isValidYouTubeUrl(transcription.value)) {
     error.value = 'Please enter a valid YouTube URL containing a video ID (v= parameter)'
     loading.value = false
@@ -423,22 +396,18 @@ const handleFileUpload = async () => {
 
   try {
     loading.value = true
-    // Track transcription event in PostHog
     posthog?.capture('Transcribing', { property: transcription.value })
 
-    // Download audio from the provided URL
-    const filestuff = JSON.parse(await downloadAudio(transcription.value))
-    filename.value = filestuff.name
+    const fileInfo = JSON.parse(await downloadAudio(transcription.value))
+    filename.value = fileInfo.name
     if (!filename.value) {
       error.value = 'Failed to download audio. Please check the URL and try again.'
       loading.value = false
       return
     }
 
-    // Process the downloaded audio file
-    await processAudioFile(filestuff)
+    await processAudioFile(fileInfo)
   } catch (err: any) {
-    // Handle any errors that occur during the process
     error.value = `${err.statusMessage || 'Unknown error'}`
     loading.value = false
   }
@@ -460,33 +429,25 @@ const downloadAudio = async (url: string): Promise<string> => {
   })
 }
 
-// Function to process the downloaded audio file
 const processAudioFile = async (filepath: string) => {
-  // Create a new Audio object with the given file path
   const audio = new Audio(process.env.NODE_ENV == 'development' ? filepath.url : config.public.path_to_download_files + filepath.url)
 
-  // Add an event listener for when the audio metadata is loaded
   audio.addEventListener('loadedmetadata', async () => {
-    // Set the duration of the audio
     duration.value = audio.duration
     console.log(`MP3 file length: ${duration.value} seconds`)
 
-    // Check if the audio duration exceeds the maximum allowed length (20 minutes)
     if (duration.value > 1200) {
       error.value = 'Video too long. Max 20 minutes'
       loading.value = false
       return
     }
 
-    // Attempt to transcribe the audio file
     const result = await transcribeAudio(filepath.url)
 
     if (result) {
       loading.value = false
-      // Delete the temporary audio file after processing
       await deleteExistingFile()
     } else {
-      // If transcription fails, set an error message
       error.value = 'Error. Try again.'
       loading.value = false
     }
@@ -499,7 +460,6 @@ const generateSRT = (chunks: any[]): string => {
     srtResultElement.scrollTop = srtResultElement.scrollHeight;
   }
 
-  // Call scrollToBottom after generating SRT content
   return chunks.map((chunk, index) => {
     const startTime = formatSRTTime(chunk.timestamp[0])
     const endTime = formatSRTTime(chunk.timestamp[1])
