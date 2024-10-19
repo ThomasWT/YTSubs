@@ -332,7 +332,6 @@ const testWorkerProcessing = async (filepath) => {
           } else {
             if (e.data.status == 'complete') {
               resolve(e.data)
-              worker.terminate()
             }
           }
         }
@@ -340,7 +339,6 @@ const testWorkerProcessing = async (filepath) => {
 
       worker.addEventListener('error', (error) => {
         reject(error)
-        worker.terminate()
       })
     })
   } catch (error) {
