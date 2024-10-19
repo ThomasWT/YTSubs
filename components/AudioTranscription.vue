@@ -115,19 +115,6 @@
         </div>
 
         <pre id="srtResult" class="bg-gray-100 p-4 rounded-md text-sm text-gray-800 overflow-x-auto shadow-md max-h-56">{{ srtContent }}</pre>
-
-        <div v-if="srtContent" class="mb-6 gap-2 flex flex-col">
-          <div class="flex justify-end">
-            <button :disabled="loading" class="text-white rounded-md flex items-center" @click="downloadSRT">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              Download
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   </div>
