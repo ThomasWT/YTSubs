@@ -1,6 +1,7 @@
  
 import { pipeline, WhisperTextStreamer } from "@huggingface/transformers";
-
+var transcriber
+var p;
 // Define model factories
 // Ensures only one model is created of each type
 class PipelineFactory {
@@ -37,14 +38,32 @@ self.addEventListener("message", async (event) => {
 
     // Do some work...
     // TODO use message data
-    let transcript = await transcribe(message);
-    if (transcript === null) return;
+    if(message.status == 'transcribeVideo') {
+        let transcript = await transcribe(message);
+        if (transcript === null) return;
+            // Send the result back to the main thread
+        self.postMessage({
+            status: "complete",
+            data: transcript,
+        });
+    }
 
-    // Send the result back to the main thread
-    self.postMessage({
-        status: "complete",
-        data: transcript,
-    });
+    
+    if(message == 'loadModel') {
+
+        // Load transcriber model
+        p = AutomaticSpeechRecognitionPipelineFactory;
+        transcriber = await p.getInstance((data) => {
+            self.postMessage(data);
+        });
+        self.postMessage({
+            status: "modelLoaded"
+        });
+        
+    }
+    
+
+
 });
 
 class AutomaticSpeechRecognitionPipelineFactory extends PipelineFactory {
@@ -55,7 +74,6 @@ class AutomaticSpeechRecognitionPipelineFactory extends PipelineFactory {
 const transcribe = async (audiodata) => {
     const model = 'onnx-community/whisper-large-v3-turbo'
     const isDistilWhisper = model.startsWith("distil-whisper/");
-    const p = AutomaticSpeechRecognitionPipelineFactory;
     if (p.model !== model) {
         // Invalidate model if different
         p.model = model;
@@ -65,11 +83,6 @@ const transcribe = async (audiodata) => {
             p.instance = null;
         }
     }
-
-    // Load transcriber model
-    const transcriber = await p.getInstance((data) => {
-        self.postMessage(data);
-    });
 
     const time_precision =
         transcriber.processor.feature_extractor.config.chunk_length /
