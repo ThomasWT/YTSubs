@@ -54,7 +54,10 @@ self.addEventListener("message", async (event) => {
         // Load transcriber model
         p = AutomaticSpeechRecognitionPipelineFactory;
         transcriber = await p.getInstance((data) => {
-            self.postMessage(data);
+            self.postMessage({
+                status: "downloadProgress",
+                progress: data
+            });
         });
         self.postMessage({
             status: "modelLoaded"
