@@ -17,6 +17,9 @@ importers:
       '@nuxtjs/tailwindcss':
         specifier: ^6.12.1
         version: 6.12.1(magicast@0.3.5)(rollup@4.23.0)
+      '@vueuse/core':
+        specifier: ^11.1.0
+        version: 11.1.0(vue@3.5.10)
       '@vueuse/motion':
         specifier: ^2.2.5
         version: 2.2.5(magicast@0.3.5)(rollup@4.23.0)(vue@3.5.10)
@@ -1463,8 +1466,14 @@ packages:
   '@vueuse/core@10.11.1':
     resolution: {integrity: sha512-guoy26JQktXPcz+0n3GukWIy/JDNKti9v6VEMu6kV2sYBsWuGiTU8OWdg+ADfUbHg3/3DlqySDe7JmdHrktiww==}
 
+  '@vueuse/core@11.1.0':
+    resolution: {integrity: sha512-P6dk79QYA6sKQnghrUz/1tHi0n9mrb/iO1WTMk/ElLmTyNqgDeSZ3wcDf6fRBGzRJbeG1dxzEOvLENMjr+E3fg==}
+
   '@vueuse/metadata@10.11.1':
     resolution: {integrity: sha512-IGa5FXd003Ug1qAZmyE8wF3sJ81xGLSqTqtQ6jaVfkeZ4i5kS2mwQF61yhVqojRnenVew5PldLyRgvdl4YYuSw==}
+
+  '@vueuse/metadata@11.1.0':
+    resolution: {integrity: sha512-l9Q502TBTaPYGanl1G+hPgd3QX5s4CGnpXriVBR5fEZ/goI6fvDaVmIl3Td8oKFurOxTmbXvBPSsgrd6eu6HYg==}
 
   '@vueuse/motion@2.2.5':
     resolution: {integrity: sha512-pcqMdpPbm/Pd/rbQQ/sHyykdOahj0rueZ8WpLhhk8i1tbEcga80EhNJLn99G9J9DSuOvkJNYuv1n2OntGUc1rQ==}
@@ -1473,6 +1482,9 @@ packages:
 
   '@vueuse/shared@10.11.1':
     resolution: {integrity: sha512-LHpC8711VFZlDaYUXEBbFBCQ7GS3dVU9mjOhhMhXP6txTV4EhYQg/KGnQuvt/sPAtoUKq7VVUnL6mVtFoL42sA==}
+
+  '@vueuse/shared@11.1.0':
+    resolution: {integrity: sha512-YUtIpY122q7osj+zsNMFAfMTubGz0sn5QzE5gPzAIiCmtt2ha3uQUY1+JPyL4gRCTsLPX82Y9brNbo/aqlA91w==}
 
   abbrev@1.1.1:
     resolution: {integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==}
@@ -5770,7 +5782,19 @@ snapshots:
       - '@vue/composition-api'
       - vue
 
+  '@vueuse/core@11.1.0(vue@3.5.10)':
+    dependencies:
+      '@types/web-bluetooth': 0.0.20
+      '@vueuse/metadata': 11.1.0
+      '@vueuse/shared': 11.1.0(vue@3.5.10)
+      vue-demi: 0.14.10(vue@3.5.10)
+    transitivePeerDependencies:
+      - '@vue/composition-api'
+      - vue
+
   '@vueuse/metadata@10.11.1': {}
+
+  '@vueuse/metadata@11.1.0': {}
 
   '@vueuse/motion@2.2.5(magicast@0.3.5)(rollup@4.23.0)(vue@3.5.10)':
     dependencies:
@@ -5791,6 +5815,13 @@ snapshots:
       - webpack-sources
 
   '@vueuse/shared@10.11.1(vue@3.5.10)':
+    dependencies:
+      vue-demi: 0.14.10(vue@3.5.10)
+    transitivePeerDependencies:
+      - '@vue/composition-api'
+      - vue
+
+  '@vueuse/shared@11.1.0(vue@3.5.10)':
     dependencies:
       vue-demi: 0.14.10(vue@3.5.10)
     transitivePeerDependencies:

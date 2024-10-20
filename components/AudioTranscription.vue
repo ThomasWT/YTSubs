@@ -1,5 +1,4 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center p-4 font-[Inter]">
     <div v-motion="{ initial: { opacity: 0, y: 30, }, enter: { opacity: 1, y: 0, transition: { duration: 1000 } } }"
       class="cardcontainer backdrop-blur-md bg-purple-300/50 rounded-lg shadow-2xl p-8 max-w-2xl w-full border-2 border-purple-400/30">
       <div class="flex flex-col justify-center  items-center  mb-8">
@@ -113,11 +112,9 @@
             Download
           </button>
         </div>
-
         <pre id="srtResult" class="bg-gray-100 p-4 rounded-md text-sm text-gray-800 overflow-x-auto shadow-md max-h-56">{{ srtContent }}</pre>
       </div>
     </div>
-  </div>
 </template>
 
 <script setup lang="ts">
