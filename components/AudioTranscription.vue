@@ -1,6 +1,10 @@
 <template>
     <div v-motion="{ initial: { opacity: 0, y: 30, }, enter: { opacity: 1, y: 0, transition: { duration: 1000 } } }"
       class="cardcontainer backdrop-blur-md bg-purple-300/50 rounded-lg shadow-2xl p-8 max-w-2xl w-full border-2 border-purple-400/30">
+      <div v-motion="{ initial: { opacity: 0 }, enter: { opacity: 0.6, transition: { duration: 500, delay: 500 } } }" class="absolute top-2 font-bold uppercase opacity-40 right-2 text-xs bg-green-100 w-auto justify-center items-center inline-flex px-2 border border-green-600 py-1 rounded text-green-600">
+        <span class="flex w-2 h-2 mr-1 bg-green-500 rounded-full"></span>
+        {{ webgpuAvailable ? 'using webgpu' : 'using wasm' }}
+      </div>
       <div class="flex flex-col justify-center  items-center  mb-8">
         <h1
           v-motion="{ initial: { opacity: 0, y: 30, scale: 0.9, filter: 'blur(10px)' }, enter: { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', transition: { duration: 1000 } } }"
@@ -132,7 +136,7 @@ const modelLoaded = ref(false)
 const downloadingModel = ref(false)
 const downloadModelProgress = ref(0)
 const worker = new transcriberWorker()
-
+const webgpuAvailable = ref(navigator.gpu != null)
 // Composables
 const { $posthog } = useNuxtApp()
 const posthog = $posthog()

@@ -2,6 +2,8 @@
 import { pipeline, WhisperTextStreamer } from "@huggingface/transformers";
 var transcriber
 var p;
+
+
 // Define model factories
 // Ensures only one model is created of each type
 class PipelineFactory {
@@ -24,7 +26,7 @@ class PipelineFactory {
                             : "fp32",
                     decoder_model_merged: "q4", // or 'fp32' ('fp16' is broken)
                 },
-                device: "webgpu",
+                device: navigator.gpu ? 'webgpu' : 'wasm',
                 progress_callback,
             });
         }

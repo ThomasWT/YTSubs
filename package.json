@@ -10,7 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@huggingface/transformers": "^3.0.0-alpha.20",
+    "@huggingface/transformers": "^3.0.0",
     "@nuxt/fonts": "^0.10.0",
     "@nuxtjs/tailwindcss": "^6.12.1",
     "@vueuse/core": "^11.1.0",
