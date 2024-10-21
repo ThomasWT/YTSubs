@@ -26,7 +26,7 @@ class PipelineFactory {
                             : "fp32",
                     decoder_model_merged: "q4", // or 'fp32' ('fp16' is broken)
                 },
-                device: navigator.gpu ? 'webgpu' : 'wasm',
+                device: navigator.gpu ? 'webgpu' : '',
                 progress_callback,
             });
         }

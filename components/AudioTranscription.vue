@@ -1,8 +1,8 @@
 <template>
     <div v-motion="{ initial: { opacity: 0, y: 30, }, enter: { opacity: 1, y: 0, transition: { duration: 1000 } } }"
       class="cardcontainer backdrop-blur-md bg-purple-300/50 rounded-lg shadow-2xl p-8 max-w-2xl w-full border-2 border-purple-400/30">
-      <div v-motion="{ initial: { opacity: 0 }, enter: { opacity: 0.6, transition: { duration: 500, delay: 500 } } }" class="absolute top-2 font-bold uppercase opacity-40 right-2 text-xs bg-green-100 w-auto justify-center items-center inline-flex px-2 border border-green-600 py-1 rounded text-green-600">
-        <span class="flex w-2 h-2 mr-1 bg-green-500 rounded-full"></span>
+      <div v-motion="{ initial: { opacity: 0 }, enter: { opacity: 0.6, transition: { duration: 500, delay: 500 } } }" class="absolute top-2 font-bold uppercase opacity-40 right-2 text-xs bg-green-100 w-auto justify-center items-center inline-flex px-2 border border-green-600 py-1 rounded text-green-600" :class="{'bg-orange-100 border-orange-600 text-orange-600': !webgpuAvailable}">
+        <span class="flex w-2 h-2 mr-1 bg-green-500 rounded-full" :class="{'bg-orange-500' : !webgpuAvailable}"></span>
         {{ webgpuAvailable ? 'using webgpu' : 'using wasm' }}
       </div>
       <div class="flex flex-col justify-center  items-center  mb-8">
@@ -136,7 +136,7 @@ const modelLoaded = ref(false)
 const downloadingModel = ref(false)
 const downloadModelProgress = ref(0)
 const worker = new transcriberWorker()
-const webgpuAvailable = ref(navigator.gpu != null)
+const webgpuAvailable = ref(true)
 // Composables
 const { $posthog } = useNuxtApp()
 const posthog = $posthog()
@@ -255,8 +255,13 @@ posthog?.capture('$pageview', {
 const estimatedProcessingTime = computed(() => {
   if (duration.value > 0) {
     // Data points
-    const durations = [633, 76, 136]; // in seconds
-    const processingTimes = [134, 12, 20]; // in seconds
+    let durations = [633, 76, 136]; // in seconds
+    let processingTimes = [134, 12, 20]; // in seconds
+
+    if(!webgpuAvailable.value) {
+      durations = [76, 77]; // in seconds
+      processingTimes = [272, 273]; // in seconds
+    }
 
     // Calculate slope and intercept for linear regression
     const n = durations.length;
@@ -310,6 +315,10 @@ const processAudioWithWorker = async (filepath) => {
       worker.addEventListener('message', (e) => {
         if (e.data.status == 'update') {
           srtContent.value = generateSRT(e.data.data.chunks)
+          const srtResultElement = document.getElementById('srtResult');
+          if (srtResultElement) {
+            srtResultElement.scrollTop = srtResultElement.scrollHeight;
+          }
         } else if (e.data.status == 'complete') {
           resolve(e.data)
         }
@@ -443,11 +452,6 @@ const processAudioFile = async (filepath: string) => {
 }
 
 const generateSRT = (chunks: any[]): string => {
-  const srtResultElement = document.getElementById('srtResult');
-  if (srtResultElement) {
-    srtResultElement.scrollTop = srtResultElement.scrollHeight;
-  }
-
   return chunks.map((chunk, index) => {
     const startTime = formatSRTTime(chunk.timestamp[0])
     const endTime = formatSRTTime(chunk.timestamp[1])
