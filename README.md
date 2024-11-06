@@ -6,6 +6,15 @@ This is just a small sideproject. It does not include any best practice and is m
 
 YTSubs is a web application that allows users to generate subtitles from YouTube videos using Client side loaded models from [transformers.js](https://github.com/xenova/transformers.js/tree/v3)
 
+> [!WARNING]  
+> As of October 2024, global WebGPU support is around 70% (according to [caniuse.com](https://caniuse.com/webgpu)), meaning some users may not be able to use the API.
+>
+> If the following demos do not work in your browser, you may need to enable it using a feature flag:
+>
+> - Firefox: with the `dom.webgpu.enabled` flag (see [here](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Experimental_features#:~:text=tested%20by%20Firefox.-,WebGPU%20API,-The%20WebGPU%20API)).
+> - Safari: with the `WebGPU` feature flag (see [here](https://webkit.org/blog/14879/webgpu-now-available-for-testing-in-safari-technology-preview/)).
+> - Older Chromium browsers (on Windows, macOS, Linux): with the `enable-unsafe-webgpu` flag (see [here](https://developer.chrome.com/docs/web-platform/webgpu/troubleshooting-tips)).
+
 ## Features
 - Experimental running on WebGPU from [transformers v3](https://github.com/xenova/transformers.js/tree/v3)
 - Generate subtitles from YouTube videos using client side ai
