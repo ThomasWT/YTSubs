@@ -2,6 +2,7 @@ import { Downloader } from 'ytdl-mp3';
 import fs from 'fs/promises';
 import ffmpeg from "fluent-ffmpeg";
 import ytdl from '@distube/ytdl-core'
+import { createWriteStream } from 'fs';
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
@@ -68,14 +69,6 @@ async function handleMp3Download(url: string, outputDir: string, config: any): P
   });
 
   try {
-    // Get video info using ytdl-core with the extracted video ID
-/*     youtubedl('https://www.youtube.com/watch?v='+videoId, {
-      dumpSingleJson: true,
-      noCheckCertificates: true,
-      noWarnings: true,
-      preferFreeFormats: true,
-      addHeader: ['referer:youtube.com', 'user-agent:googlebot']
-    }).then(output => console.log(output)) */
     const videoInfo = await ytdl.getInfo(videoId);
     const videoTitle = videoInfo.videoDetails.title;
     const videoDuration = parseInt(videoInfo.videoDetails.lengthSeconds);
@@ -91,17 +84,24 @@ async function handleMp3Download(url: string, outputDir: string, config: any): P
     console.log(`Video Title: ${videoTitle}`);
     console.log(`Video Duration: ${videoDuration} seconds`);
 
-    // Use the video ID for downloading
-    const downloadResult = await downloader.downloadSong(`https://www.youtube.com/watch?v=${videoId}`);
+    // Download the MP4 file and wait for it to complete
+    await new Promise((resolve, reject) => {
+      const downloadResult = ytdl(`https://www.youtube.com/watch?v=${videoId}`)
+        .pipe(createWriteStream(outputDir + `/${videoId}.mp4`))
+        .on('finish', resolve)
+        .on('error', reject);
+    });
 
-    // Return the path to the downloaded file, combining pathToDownloadFiles with the filename
-    let filename = downloadResult.toString().split('/').pop();
+    
 
+    let filename = `${videoId}.mp3`;
+
+    // Now that download is complete, convert to WAV
     await new Promise(async (resolve, reject) => {
       ffmpeg(outputDir + '/' + filename)
         .toFormat("wav")
-        .audioFrequency(16000)  // Set sample rate to 16000 Hz
-        .outputOptions('-acodec pcm_f32le')  // Set bit depth to 32-bit floating point
+        .audioFrequency(16000)
+        .outputOptions('-acodec pcm_f32le')
         .on("error", (err) => {
           reject(err);
         })
@@ -111,8 +111,10 @@ async function handleMp3Download(url: string, outputDir: string, config: any): P
         .save(outputDir + '/' + filename.replace('mp3', 'wav'));
     });
 
-    await handleFileDeletion(filename.split('/').pop(), pathToStoreFiles)
-    filename = filename.replace('mp3', 'wav')
+    // Clean up the MP4 file after conversion
+    await handleFileDeletion(filename, pathToStoreFiles);
+    filename = filename.replace('mp3', 'wav');
+
     let buffer = Buffer.from(await fetch(config.domain + '/' + filename).then(x => x.arrayBuffer()))
 
 
