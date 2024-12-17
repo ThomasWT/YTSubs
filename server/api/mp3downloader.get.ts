@@ -1,7 +1,7 @@
 import { Downloader } from 'ytdl-mp3';
 import fs from 'fs/promises';
 import ffmpeg from "fluent-ffmpeg";
-import ytdl from 'ytdl-core'
+import ytdl from '@distube/ytdl-core'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
@@ -69,6 +69,13 @@ async function handleMp3Download(url: string, outputDir: string, config: any): P
 
   try {
     // Get video info using ytdl-core with the extracted video ID
+/*     youtubedl('https://www.youtube.com/watch?v='+videoId, {
+      dumpSingleJson: true,
+      noCheckCertificates: true,
+      noWarnings: true,
+      preferFreeFormats: true,
+      addHeader: ['referer:youtube.com', 'user-agent:googlebot']
+    }).then(output => console.log(output)) */
     const videoInfo = await ytdl.getInfo(videoId);
     const videoTitle = videoInfo.videoDetails.title;
     const videoDuration = parseInt(videoInfo.videoDetails.lengthSeconds);
