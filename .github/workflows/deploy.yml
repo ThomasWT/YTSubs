@@ -20,7 +20,7 @@ jobs:
       run: npm install -g pnpm
 
     - name: Install packages
-      run: pnpm install
+      run: pnpm install --no-frozen-lockfile
     - name: Create .env file
       run: |
         echo "DOMAIN=${{ secrets.DOMAIN }}" > .env
