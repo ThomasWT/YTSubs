@@ -1,8 +1,6 @@
 import { ytmp3 } from 'nothing-yt';
 import fs from 'fs/promises';
 import ffmpeg from "fluent-ffmpeg";
-import ytdl from '@distube/ytdl-core'
-import { createWriteStream } from 'fs';
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
