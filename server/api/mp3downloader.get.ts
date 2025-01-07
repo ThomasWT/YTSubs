@@ -1,4 +1,4 @@
-import { Downloader } from 'ytdl-mp3';
+import { ytmp3 } from 'nothing-yt';
 import fs from 'fs/promises';
 import ffmpeg from "fluent-ffmpeg";
 import ytdl from '@distube/ytdl-core'
@@ -18,7 +18,6 @@ export default defineEventHandler(async (event) => {
 
   // Handle MP3 download request
   if (query.url) {
-
     return handleMp3Download(query.url as string, pathToStoreFiles, config);
   }
 
@@ -49,90 +48,75 @@ async function handleFileDeletion(filename: string, publicDir: string): Promise<
 
 // Function to handle MP3 download
 async function handleMp3Download(url: string, outputDir: string, config: any): Promise<string> {
-  const pathToStoreFiles = config.path_to_store_temp_files
-
-  // Extract video ID from the URL
-  let videoId: string;
   try {
-    videoId = ytdl.getVideoID(decodeURIComponent(url));
-  } catch (error) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Invalid YouTube URL'
-    });
-  }
+    // Use nothing-yt to get the audio
+    const result = await ytmp3(decodeURIComponent(url), "320"); // Using highest quality
 
-  // Initialize the downloader with options
-  const downloader = new Downloader({
-    getTags: false,
-    outputDir: outputDir
-  });
+    if (!result.status) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: result.result
+      });
+    }
 
-  try {
-    const videoInfo = await ytdl.getInfo(videoId);
-    const videoTitle = videoInfo.videoDetails.title;
-    const videoDuration = parseInt(videoInfo.videoDetails.lengthSeconds);
+    // Get the video metadata
+    const videoInfo = result.metadata;
+    const videoDuration = parseInt(videoInfo.duration.seconds);
 
-    // Check if video duration exceeds 20 minutes (1200 seconds)
-    if (videoDuration > 1200) {
+    // Check duration limit
+    if (videoDuration > 1200) { // 20 minutes
       throw createError({
         statusCode: 422,
         statusMessage: 'Video duration exceeds 20 minutes limit'
       });
     }
 
-    console.log(`Video Title: ${videoTitle}`);
+    console.log(`Video Title: ${videoInfo.title}`);
     console.log(`Video Duration: ${videoDuration} seconds`);
 
-    // Download the MP4 file and wait for it to complete
+    // Download the file from the provided URL
+    const response = await fetch(result.download.url);
+    const buffer = Buffer.from(await response.arrayBuffer());
+
+    // Generate filenames for both MP3 and WAV
+    const mp3Filename = `${videoInfo.videoId}.mp3`;
+    const wavFilename = `${videoInfo.videoId}.wav`;
+    const mp3FilePath = `${outputDir}/${mp3Filename}`;
+    const wavFilePath = `${outputDir}/${wavFilename}`;
+
+    // Save the MP3 file
+    await fs.writeFile(mp3FilePath, buffer);
+
+    // Convert MP3 to WAV format with required specifications
     await new Promise((resolve, reject) => {
-      const downloadResult = ytdl(`https://www.youtube.com/watch?v=${videoId}`)
-        .pipe(createWriteStream(outputDir + `/${videoId}.mp4`))
-        .on('finish', resolve)
-        .on('error', reject);
-    });
-
-    
-
-    let filename = `${videoId}.mp3`;
-
-    // Now that download is complete, convert to WAV
-    await new Promise(async (resolve, reject) => {
-      ffmpeg(outputDir + '/' + filename)
+      ffmpeg(mp3FilePath)
         .toFormat("wav")
         .audioFrequency(16000)
         .outputOptions('-acodec pcm_f32le')
-        .on("error", (err) => {
-          reject(err);
+        .on("error", reject)
+        .on("end", async () => {
+          // Delete the MP3 file after conversion
+          try {
+            await fs.unlink(mp3FilePath);
+          } catch (err) {
+            console.error('Error deleting MP3 file:', err);
+          }
+          resolve(true);
         })
-        .on("end", () => {
-          resolve();
-        })
-        .save(outputDir + '/' + filename.replace('mp3', 'wav'));
+        .save(wavFilePath);
     });
 
-    // Clean up the MP4 file after conversion
-    await handleFileDeletion(filename, pathToStoreFiles);
-    filename = filename.replace('mp3', 'wav');
+    return JSON.stringify({ 
+      name: wavFilename, 
+      buffer: buffer,
+      url: '/' + wavFilename 
+    });
 
-    let buffer = Buffer.from(await fetch(config.domain + '/' + filename).then(x => x.arrayBuffer()))
-
-
-
-    return JSON.stringify({ name: filename, buffer: buffer, url: '/' + filename });
   } catch (err: any) {
     console.error('Error downloading MP3:', err);
-
-    //If the file already exist, delete it and try once more.
-    if (err.message.includes("Output file already exists")) {
-      await handleFileDeletion(err.message.split('/').pop(), pathToStoreFiles);
-      return handleMp3Download(url, outputDir, config)
-    } else {
-      throw createError({
-        statusCode: 500,
-        statusMessage: err.statusMessage
-      })
-    }
-
+    throw createError({
+      statusCode: 500,
+      statusMessage: err.statusMessage || 'Failed to download audio'
+    });
   }
 }
