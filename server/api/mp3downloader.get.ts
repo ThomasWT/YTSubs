@@ -1,4 +1,4 @@
-import { ytmp3 } from 'nothing-yt';
+import { ytmp3 } from '@vreden/youtube_scraper';
 import fs from 'fs/promises';
 import ffmpeg from "fluent-ffmpeg";
 
