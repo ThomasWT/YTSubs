@@ -442,8 +442,8 @@ const processAudioFile = async (filepath: string) => {
     const result = await transcribeAudio(filepath.url)
 
     if (result) {
-      loading.value = false
       await deleteExistingFile()
+      loading.value = false
     } else {
       error.value = 'Error. Try again.'
       await deleteExistingFile()
