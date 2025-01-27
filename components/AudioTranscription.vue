@@ -446,6 +446,7 @@ const processAudioFile = async (filepath: string) => {
       await deleteExistingFile()
     } else {
       error.value = 'Error. Try again.'
+      await deleteExistingFile()
       loading.value = false
     }
   })
