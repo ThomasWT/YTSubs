@@ -22,8 +22,8 @@ importers:
         specifier: ^6.12.1
         version: 6.12.2(magicast@0.3.5)(rollup@4.30.1)
       '@vreden/youtube_scraper':
-        specifier: ^1.2.5
-        version: 1.2.5
+        specifier: ^1.2.6
+        version: 1.2.6
       '@vueuse/core':
         specifier: ^11.1.0
         version: 11.3.0(vue@3.5.13(typescript@5.7.2))
@@ -1146,8 +1146,8 @@ packages:
       vite: ^5.0.0 || ^6.0.0
       vue: ^3.2.25
 
-  '@vreden/youtube_scraper@1.2.5':
-    resolution: {integrity: sha512-GithwdMlXnSdMC6EGsqT/CNT5xKhVBO5qN1kmJYtokQG5mJHjp1qCy8uN2I8A7dDsdNUtaR4gf0jBbG6Z1yv9g==}
+  '@vreden/youtube_scraper@1.2.6':
+    resolution: {integrity: sha512-8M+S1Jx8BMKN/13FOlpPqhQif8L3o8VXNxWhPtVFSW1x2zDkGPKJxoiRvYOrzpkPLzSkIxpr66jD3iYp2bw8QQ==}
 
   '@vue-macros/common@1.15.1':
     resolution: {integrity: sha512-O0ZXaladWXwHplQnSjxLbB/G1KpdWCUNJPNYVHIxHonGex1BGpoB4fBZZLgddHgAiy18VZG/Iu5L0kwG+SV7JQ==}
@@ -5447,7 +5447,7 @@ snapshots:
       vite: 6.0.7(@types/node@22.10.5)(jiti@2.4.2)(sass-embedded@1.83.1)(terser@5.37.0)(yaml@2.7.0)
       vue: 3.5.13(typescript@5.7.2)
 
-  '@vreden/youtube_scraper@1.2.5':
+  '@vreden/youtube_scraper@1.2.6':
     dependencies:
       axios: 0.28.0
       yt-search: 2.12.1
