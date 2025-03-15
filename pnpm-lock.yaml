@@ -6,7 +6,7 @@ settings:
 
 overrides:
   jsonpath-plus: 10.2.0
-  axios: 0.28.0
+  axios: '>=1.8.2'
   koa: '>=2.15.4'
 
 importers:
@@ -1391,8 +1391,8 @@ packages:
     peerDependencies:
       postcss: ^8.1.0
 
-  axios@0.28.0:
-    resolution: {integrity: sha512-Tu7NYoGY4Yoc7I+Npf9HhUMtEEpV7ZiLH9yndTCoNhcpBH0kwcvFbzYN9/u5QKI5A6uefjsNNWaz5olJVYS62Q==}
+  axios@1.8.3:
+    resolution: {integrity: sha512-iP4DebzoNlP/YN2dpwCgb8zoCmhtkajzS48JvwmkSkXvPI3DHc7m+XYL5tGnSlJtR6nImXZmdCuN5aP8dh1d8A==}
 
   b4a@1.6.7:
     resolution: {integrity: sha512-OnAYlL5b7LEkALw87fUVafQw5rVR9RjwGd4KUwNQ6DrrNmaVaUCgLipfVlzrPQ4tWOR9P0IXGNOx50jYCCdSJg==}
@@ -5450,7 +5450,7 @@ snapshots:
 
   '@vreden/youtube_scraper@1.2.6':
     dependencies:
-      axios: 0.28.0
+      axios: 1.8.3
       yt-search: 2.12.1
     transitivePeerDependencies:
       - debug
@@ -5784,7 +5784,7 @@ snapshots:
       postcss: 8.4.49
       postcss-value-parser: 4.2.0
 
-  axios@0.28.0:
+  axios@1.8.3:
     dependencies:
       follow-redirects: 1.15.9
       form-data: 4.0.1
@@ -7354,7 +7354,7 @@ snapshots:
 
   nothing-yt@1.2.3:
     dependencies:
-      axios: 0.28.0
+      axios: 1.8.3
       yt-search: 2.12.1
     transitivePeerDependencies:
       - debug

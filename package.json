@@ -32,13 +32,13 @@
   },
   "overrides": {
     "jsonpath-plus": "10.2.0",
-    "axios": "0.28.0",
+    "axios": ">=1.8.2",
     "koa": ">=2.15.4"
   },
   "pnpm": {
     "overrides": {
       "jsonpath-plus": "10.2.0",
-      "axios": "0.28.0",
+      "axios": ">=1.8.2",
       "koa": ">=2.15.4"
     }
   }
