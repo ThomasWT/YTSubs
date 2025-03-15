@@ -31,13 +31,13 @@
     "nuxi": "^3.14.0"
   },
   "overrides": {
-    "jsonpath-plus": "10.2.0",
+    "jsonpath-plus": "10.3.0",
     "axios": ">=1.8.2",
     "koa": ">=2.15.4"
   },
   "pnpm": {
     "overrides": {
-      "jsonpath-plus": "10.2.0",
+      "jsonpath-plus": "10.3.0",
       "axios": ">=1.8.2",
       "koa": ">=2.15.4"
     }
