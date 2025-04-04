@@ -10,7 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@huggingface/transformers": "^3.4.0",
+    "@huggingface/transformers": "^3.4.2",
     "@nuxt/fonts": "^0.10.3",
     "@nuxtjs/tailwindcss": "^6.13.2",
     "@vreden/youtube_scraper": "^1.2.6",
