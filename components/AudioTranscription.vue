@@ -285,9 +285,15 @@ const estimatedProcessingTime = computed(() => {
   return '';
 });
 
-const formatAudioData = async (url) => {
-  const response = await fetch(process.env.NODE_ENV == 'development' ? url : config.public.path_to_download_files + url);
+const formatAudioData = async (filename) => {
+  // Fetch from the new storage-based API endpoint
+  const audioUrl = `/api/audio?id=${filename}`;
+  const response = await fetch(audioUrl);
   const arrayBuffer = await response.arrayBuffer();
+  
+  // Delete file from server storage immediately after we have it in memory
+  await cleanupAudioFile(filename);
+  
   let audioData = new Uint8Array(arrayBuffer);
 
   let wav = new WaveFile(audioData);
@@ -377,7 +383,6 @@ const downloadSRT = () => {
 const handleTranscriptionRequest = async () => {
   error.value = ''
   duration.value = 0
-  await deleteExistingFile()
 
   if (!transcription.value) {
     error.value = 'Please enter a YouTube URL'
@@ -407,13 +412,8 @@ const handleTranscriptionRequest = async () => {
   } catch (err: any) {
     error.value = `${err.statusMessage || 'Unknown error'}`
     loading.value = false
+    // File is automatically deleted by the server after delivery
   }
-}
-
-const deleteExistingFile = async () => {
-  await $fetch('/api/mp3downloader', {
-    query: { delfile: filename.value }
-  })
 }
 
 const isValidYouTubeUrl = (url: string): boolean => {
@@ -426,12 +426,26 @@ const downloadAudio = async (url: string): Promise<string> => {
   })
 }
 
-const processAudioFile = async (filepath: string) => {
-  const audio = new Audio(process.env.NODE_ENV == 'development' ? filepath.url : config.public.path_to_download_files + filepath.url)
+const cleanupAudioFile = async (filename: string) => {
+  try {
+    await $fetch('/api/audio-cleanup', {
+      method: 'POST',
+      body: { filename }
+    });
+    console.log(`Cleaned up audio file: ${filename}`);
+  } catch (err) {
+    console.error('Error cleaning up audio file:', err);
+  }
+}
+
+const processAudioFile = async (fileInfo: any) => {
+  // Use the new storage-based API endpoint
+  const audioUrl = `/api/audio?id=${fileInfo.name}`;
+  const audio = new Audio(audioUrl);
 
   audio.addEventListener('loadedmetadata', async () => {
     duration.value = audio.duration
-    console.log(`MP3 file length: ${duration.value} seconds`)
+    console.log(`Audio file length: ${duration.value} seconds`)
 
     if (duration.value > 1200) {
       error.value = 'Video too long. Max 20 minutes'
@@ -439,14 +453,12 @@ const processAudioFile = async (filepath: string) => {
       return
     }
 
-    const result = await transcribeAudio(filepath.url)
+    const result = await transcribeAudio(fileInfo.name)
 
     if (result) {
-      await deleteExistingFile()
       loading.value = false
     } else {
       error.value = 'Error. Try again.'
-      await deleteExistingFile()
       loading.value = false
     }
   })

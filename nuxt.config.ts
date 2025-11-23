@@ -12,6 +12,15 @@ export default defineNuxtConfig({
       posthogHost: process.env.POSTHOG_HOST
     }
   },
+  // Configure Nitro storage for audio files
+  nitro: {
+    storage: {
+      'cache:audio': {
+        driver: 'fs',
+        base: './.data/audio-cache'
+      }
+    }
+  },
   // or sourcemap: true
   sourcemap: {
     server: true,
