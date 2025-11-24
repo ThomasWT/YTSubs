@@ -3,7 +3,7 @@ NPM_CONFIG_IGNORE_OPTIONAL = "false"
 PNPM_IGNORE_OPTIONAL = "false"
 
 [phases.setup]
-nixPkgs = ["nodejs_20_x", "pnpm-9_x", "python3", "gcc", "gnumake"]
+nixPkgs = ["nodejs_20", "pnpm-9_x", "python3", "gcc", "gnumake"]
 
 [phases.install]
 cmds = ["pnpm install --no-frozen-lockfile"]
