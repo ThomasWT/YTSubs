@@ -1,0 +1,22 @@
+[phases.setup]
+packages = [
+"python3"
+"make"
+"g++"
+]
+
+[phases.install]
+env = { OXC_PARSER_SKIP_NATIVE = "1" }
+run = "pnpm install --frozen-lockfile"
+
+[phases.build]
+run = "pnpm run build"
+
+[phases.start]
+run = "pnpm run start"
+
+[env]
+NIXPACKS_PATH = "/app/node_modules/.bin:$NIXPACKS_PATH"
+
+[meta]
+include = ["package.json", "pnpm-lock.yaml"]
