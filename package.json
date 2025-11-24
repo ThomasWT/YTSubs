@@ -39,7 +39,8 @@
     "axios": ">=1.8.2",
     "parse-git-config": ">=3.0.0",
     "koa": ">=2.15.4",
-    "vite": ">=6.2.7"
+    "vite": ">=6.2.7",
+    "glob": ">=10.5.0"
   },
   "pnpm": {
     "overrides": {
