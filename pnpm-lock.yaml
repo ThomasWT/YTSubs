@@ -20,6 +20,15 @@ importers:
       '@nuxtjs/tailwindcss':
         specifier: ^6.13.2
         version: 6.13.2(magicast@0.5.1)
+      '@oxc-minify/binding-linux-x64-gnu':
+        specifier: 0.99.0
+        version: 0.99.0
+      '@oxc-parser/binding-linux-x64-gnu':
+        specifier: 0.38.0
+        version: 0.38.0
+      '@oxc-transform/binding-linux-x64-gnu':
+        specifier: 0.38.0
+        version: 0.38.0
       '@vreden/youtube_scraper':
         specifier: ^1.2.6
         version: 1.2.6
@@ -890,6 +899,12 @@ packages:
     cpu: [x64]
     os: [linux]
 
+  '@oxc-minify/binding-linux-x64-gnu@0.99.0':
+    resolution: {integrity: sha512-2Iq4piS+6i96mTvvvGwhPa2BVfys7ChV2r7Do7lciZSniXwwhQNJ/6yvqsp3hgaVvXhPYfbn9dEGRb1T1wZ5ww==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [linux]
+
   '@oxc-minify/binding-linux-x64-musl@0.87.0':
     resolution: {integrity: sha512-LIqvpx9UihEW4n9QbEljDnfUdAWqhr6dRqmzSFwVAeLZRUECluLCDdsdwemrC/aZkvnisA4w0LFcFr3HmeTLJg==}
     engines: {node: '>=14.0.0'}
@@ -971,6 +986,11 @@ packages:
     resolution: {integrity: sha512-6W1ENe/nZtr2TBnrEzmdGEraEAdZOiH3YoUNNeQWuqwLkmpoHTJJdclieToPe/l2IKJ4WL3FsSLSGHE8yt/OEg==}
     engines: {node: '>=20.0.0'}
     cpu: [s390x]
+    os: [linux]
+
+  '@oxc-parser/binding-linux-x64-gnu@0.38.0':
+    resolution: {integrity: sha512-qc6NdCzcCAxCK5KVde2ULq+7cyiJwrMV/1yozSUqvu26yme56Es3rWHFuPToxrhw+2olvc93AX+PVYMy3DqrGw==}
+    cpu: [x64]
     os: [linux]
 
   '@oxc-parser/binding-linux-x64-gnu@0.87.0':
@@ -1063,6 +1083,11 @@ packages:
     resolution: {integrity: sha512-n2NTgM+3PqFagJV9UXRDNOmYesF+TO9SF9FeHqwVmW893ayef9KK+vfWAAhvOYHXYaKWT5XoHd87ODD7nruyhw==}
     engines: {node: '>=14.0.0'}
     cpu: [s390x]
+    os: [linux]
+
+  '@oxc-transform/binding-linux-x64-gnu@0.38.0':
+    resolution: {integrity: sha512-HiI14gyp3bzEnP4Rre2VQcOJx53iEB7mUoNp0tlRCR2ViAJ/fJtTP7zRBjggpiFTyqow8cKA7kCr2qkws0yXHw==}
+    cpu: [x64]
     os: [linux]
 
   '@oxc-transform/binding-linux-x64-gnu@0.87.0':
@@ -5839,6 +5864,8 @@ snapshots:
   '@oxc-minify/binding-linux-x64-gnu@0.87.0':
     optional: true
 
+  '@oxc-minify/binding-linux-x64-gnu@0.99.0': {}
+
   '@oxc-minify/binding-linux-x64-musl@0.87.0':
     optional: true
 
@@ -5882,6 +5909,8 @@ snapshots:
 
   '@oxc-parser/binding-linux-s390x-gnu@0.87.0':
     optional: true
+
+  '@oxc-parser/binding-linux-x64-gnu@0.38.0': {}
 
   '@oxc-parser/binding-linux-x64-gnu@0.87.0':
     optional: true
@@ -5931,6 +5960,8 @@ snapshots:
 
   '@oxc-transform/binding-linux-s390x-gnu@0.87.0':
     optional: true
+
+  '@oxc-transform/binding-linux-x64-gnu@0.38.0': {}
 
   '@oxc-transform/binding-linux-x64-gnu@0.87.0':
     optional: true
