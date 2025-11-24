@@ -11,9 +11,6 @@
     "start": "node .output/server/index.mjs"
   },
   "dependencies": {
-    "@oxc-parser/binding-linux-x64-gnu": "0.38.0",
-    "@oxc-transform/binding-linux-x64-gnu": "0.38.0",
-    "@oxc-minify/binding-linux-x64-gnu": "0.99.0",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@huggingface/transformers": "^3.4.2",
     "@nuxt/fonts": "^0.10.3",
@@ -35,15 +32,11 @@
   "devDependencies": {
     "nuxi": "^3.23.0"
   },
- "pnpm": {
-  "supportedArchitectures": {
-    "os": ["current"],
-    "cpu": ["x64"]
-  },
+"pnpm": {
   "overrides": {
     "nuxt": "3.19.2",
-    "vite": "6.1.0",
-    "esbuild": "0.21.5",
+    "vite": "5.4.10",
+    "esbuild": "0.19.12",
 
     "jsonpath-plus": "10.3.0",
     "@babel/helpers": "7.26.10",
@@ -57,5 +50,5 @@
     "js-yaml": "4.1.1",
     "glob": "10.5.0"
   }
-  }
+}
 }
