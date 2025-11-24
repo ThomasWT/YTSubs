@@ -35,37 +35,27 @@
   "devDependencies": {
     "nuxi": "^3.23.0"
   },
-  "overrides": {
-    "jsonpath-plus": "10.3.0",
-    "esbuild": ">=0.25.0",
-    "@babel/helpers": ">=7.26.10",
-    "axios": ">=1.8.2",
-    "parse-git-config": ">=3.0.0",
-    "koa": ">=2.15.4",
-    "vite": ">=6.2.7",
-    "glob": ">=10.5.0"
+ "pnpm": {
+  "supportedArchitectures": {
+    "os": ["current"],
+    "cpu": ["x64"]
   },
-  "pnpm": {
-    "supportedArchitectures": {
-      "os": ["current"],
-      "cpu": ["x64"]
-    },
-"overrides": {
-  "nuxt": "3.19.2",
-  "vite": "6.1.0",
-  "esbuild": "0.21.5",
+  "overrides": {
+    "nuxt": "3.19.2",
+    "vite": "6.1.0",
+    "esbuild": "0.21.5",
 
-  "jsonpath-plus": "10.3.0",
-  "@babel/helpers": "7.26.10",
-  "parse-git-config": "3.0.0",
-  "axios": "1.12.0",
-  "koa": "2.16.2",
-  "brace-expansion": "2.0.2",
-  "devalue": "5.3.2",
-  "form-data": "4.0.4",
-  "@nuxt/devtools": "2.6.4",
-  "js-yaml": "4.1.1",
-  "glob": "10.5.0"
-}
+    "jsonpath-plus": "10.3.0",
+    "@babel/helpers": "7.26.10",
+    "parse-git-config": "3.0.0",
+    "axios": "1.12.0",
+    "koa": "2.16.2",
+    "brace-expansion": "2.0.2",
+    "devalue": "5.3.2",
+    "form-data": "4.0.4",
+    "@nuxt/devtools": "2.6.4",
+    "js-yaml": "4.1.1",
+    "glob": "10.5.0"
+  }
   }
 }
