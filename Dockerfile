@@ -21,7 +21,10 @@ RUN npm install -g pnpm
 COPY package.json pnpm-lock.yaml* ./
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN pnpm ci
+
+# Approve all native module builds
+RUN pnpm approve-builds --all
 
 # Copy app code
 COPY . .
