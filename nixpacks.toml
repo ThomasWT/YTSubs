@@ -1,8 +1,6 @@
-[nixpacks]
-env = { 
-  NPM_CONFIG_IGNORE_OPTIONAL = "false", 
-  PNPM_IGNORE_OPTIONAL = "false" 
-}
+[nixpacks.env]
+NPM_CONFIG_IGNORE_OPTIONAL = "false"
+PNPM_IGNORE_OPTIONAL = "false"
 
 [phases.setup]
 nixPkgs = ["nodejs_20_x", "pnpm-9_x", "python3", "gcc", "gnumake"]
