@@ -21,7 +21,7 @@ RUN npm install -g pnpm
 COPY package.json pnpm-lock.yaml* ./
 
 # Install dependencies
-RUN pnpm ci
+RUN pnpm install --frozen-lockfile
 
 # Approve all native module builds
 RUN pnpm approve-builds --all
