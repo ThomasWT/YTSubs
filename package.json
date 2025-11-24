@@ -11,6 +11,7 @@
     "start": "node .output/server/index.mjs"
   },
   "dependencies": {
+    "@oxc-parser/binding-linux-x64-gnu": "0.38.0",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@huggingface/transformers": "^3.4.2",
     "@nuxt/fonts": "^0.10.3",
