@@ -6,7 +6,6 @@ packages = [
 ]
 
 [phases.install]
-env = { OXC_PARSER_SKIP_NATIVE = "1" }
 run = "pnpm install --frozen-lockfile"
 
 [phases.build]
