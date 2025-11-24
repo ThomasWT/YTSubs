@@ -34,10 +34,6 @@
   },
 "pnpm": {
   "overrides": {
-    "nuxt": "3.19.2",
-    "vite": "5.4.10",
-    "esbuild": "0.19.12",
-
     "jsonpath-plus": "10.3.0",
     "@babel/helpers": "7.26.10",
     "parse-git-config": "3.0.0",
