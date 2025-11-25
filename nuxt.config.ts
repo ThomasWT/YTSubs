@@ -8,8 +8,6 @@ export default defineNuxtConfig({
     path_to_store_temp_files: process.env.PATH_TO_STORE_TEMP_FILES,
     public: {
       path_to_download_files: process.env.PATH_TO_DOWNLOAD_FILES,
-      posthogPublicKey: process.env.POSTHOG_PUBLIC_KEY,
-      posthogHost: process.env.POSTHOG_HOST
     }
   },
   // Configure Nitro storage for audio files

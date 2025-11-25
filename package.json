@@ -23,7 +23,6 @@
     "nothing-yt": "^1.2.3",
     "nuxt": "^3.16.1",
     "onnxruntime-node": "^1.21.0",
-    "posthog-js": "^1.231.0",
     "sass-embedded": "^1.85.1",
     "vue": "latest",
     "vue-router": "latest",

@@ -30,7 +30,6 @@ YTSubs is a web application that allows users to generate subtitles from YouTube
 - [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
 - [Hugging Face Transformers](https://huggingface.co/transformers/) - State-of-the-art Natural Language Processing
 - [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) - For background processing
-- [PostHog](https://posthog.com/) - Open-source product analytics
 
 ## Getting Started
 

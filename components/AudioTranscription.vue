@@ -137,9 +137,6 @@ const downloadingModel = ref(false)
 const downloadModelProgress = ref(0)
 const worker = new transcriberWorker()
 const webgpuAvailable = ref(true)
-// Composables
-const { $posthog } = useNuxtApp()
-const posthog = $posthog()
 const route = useRoute()
 const config = useRuntimeConfig()
 const selectedLanguage = ref('english')
@@ -246,10 +243,6 @@ const languages = [
   "yoruba"
 ]
 
-// Capture pageview
-posthog?.capture('$pageview', {
-  current_url: route.fullPath
-})
 
 // Estimate time to process from a baseline
 const estimatedProcessingTime = computed(() => {
@@ -367,7 +360,6 @@ const transcribeAudio = async (filepath: string): Promise<any> => {
 
 const downloadSRT = () => {
   if (srtContent.value) {
-    posthog?.capture('Download SRT')
     const blob = new Blob([srtContent.value], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -398,7 +390,6 @@ const handleTranscriptionRequest = async () => {
 
   try {
     loading.value = true
-    posthog?.capture('Transcribing', { property: transcription.value })
 
     const fileInfo = JSON.parse(await downloadAudio(transcription.value))
     filename.value = fileInfo.name
