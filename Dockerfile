@@ -1,12 +1,11 @@
-# Use a Node LTS image
 FROM node:20-slim
 
-# Set working directory
 WORKDIR /app
 
-# Install build tools needed for native modules
+# Install build tools + FFmpeg
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    ffmpeg \
     python3 \
     make \
     g++ \
@@ -14,23 +13,21 @@ RUN apt-get update && \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install PNPM globally
+# Install PNPM
 RUN npm install -g pnpm
 
-# Copy package files first to leverage Docker cache
+# Copy dependency files
 COPY package.json pnpm-lock.yaml* ./
 
-# Install dependencies
-RUN pnpm install
+# Install deps
+RUN pnpm install --frozen-lockfile
 
-# Copy app code
+# Copy source code
 COPY . .
 
-# Build the app
+# Build
 RUN pnpm run build
 
-# Expose the port your app uses
 EXPOSE 3000
 
-# Start the app
-CMD ["node", ".output/server/index.mjs"]
+CMD ["pnpm", "run", "start"]
