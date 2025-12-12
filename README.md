@@ -1,4 +1,4 @@
-![Deploy to server](https://github.com/ThomasWT/YTSubs/actions/workflows/deploy.yml/badge.svg?branch=main)
+
 # YTSubs: AI-Powered YouTube Subtitle generator
 
 ### Disclaimer
